@@ -1,4 +1,5 @@
 <header id="header" id="home">
+    <!-- Header Top -->
     <div class="header-top">
         <div class="container">
             <div class="row">
@@ -8,32 +9,38 @@
                         <li><a href="#"><i class="fa fa-twitter"></i></a></li>
                         <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
                         <li><a href="#"><i class="fa fa-behance"></i></a></li>
-                    </ul>            
+                    </ul>
                 </div>
                 <div class="col-lg-6 col-sm-6 col-4 header-top-right no-padding">
                     <a href="tel:+9530123654896"><span class="lnr lnr-phone-handset"></span> <span class="text">+953 012 3654 896</span></a>
-                    <a href="mailto:support@colorlib.com"><span class="lnr lnr-envelope"></span> <span class="text">support@colorlib.com</span></a>            
+                    <a href="mailto:support@colorlib.com"><span class="lnr lnr-envelope"></span> <span class="text">support@colorlib.com</span></a>
                 </div>
-            </div>                                  
+            </div>
         </div>
     </div>
+
+    <!-- Main Menu -->
     <div class="container main-menu">
         <div class="row align-items-center justify-content-between d-flex">
             <div id="logo">
-                <a href="{{ url('/') }}"><img src="{{ asset('img/logo.png') }}" alt="SALUT Logo" /></a>
+                <a href="{{ url('/') }}">
+                    <img src="{{ asset('img/logo.png') }}" alt="SALUT Logo">
+                </a>
             </div>
             <nav id="nav-menu-container">
                 <ul class="nav-menu">
-                    <li><a href="{{ url('/') }}">Home</a></li>
-                    <li><a href="{{ url('/about') }}">About</a></li>
-                    <li class="menu-has-children"><a href="#">Perkuliahan</a>
+                    <li class="menu-active"><a href="{{ url('/') }}">HOME</a></li>
+                    <li><a href="{{ url('/about') }}">ABOUT</a></li>
+                    <li class="menu-has-children">
+                        <a href="">PERKULIAHAN</a>
                         <ul>
                             <li><a href="{{ url('/jadwal_TTM') }}">Jadwal TTM/TUWEB</a></li>
                             <li><a href="{{ url('/Jadwal_Tuton') }}">Jadwal Tuton</a></li>
                             <li><a href="{{ url('/Jadwal_Ujian') }}">Jadwal Ujian</a></li>
                         </ul>
                     </li>
-                    <li class="menu-has-children"><a href="#">Layanan</a>
+                    <li class="menu-has-children">
+                        <a href="">LAYANAN</a>
                         <ul>
                             <li><a href="{{ url('/layanan_daftar') }}">Layanan Pendaftaran</a></li>
                             <li><a href="{{ url('/layanan_regis') }}">Layanan Registrasi</a></li>
@@ -43,7 +50,8 @@
                             <li><a href="{{ url('/layanan_wisuda') }}">Layanan Wisuda</a></li>
                         </ul>
                     </li>
-                    <li class="menu-has-children"><a href="#">Fakultas</a>
+                    <li class="menu-has-children">
+                        <a href="">FAKULTAS</a>
                         <ul>
                             <li><a href="{{ url('/FEB') }}">Fakultas Ekonomi dan Bisnis</a></li>
                             <li><a href="{{ url('/FKIP') }}">Fakultas Keguruan dan Ilmu Pendidikan</a></li>
@@ -52,15 +60,17 @@
                             <li><a href="{{ url('/Pascasarjana') }}">Sekolah PascaSarjana (SPs)</a></li>
                         </ul>
                     </li>
-                    <li class="menu-has-children"><a href="#">Aplikasi</a>
+                    <li class="menu-has-children">
+                        <a href="">APLIKASI</a>
                         <ul>
                             <li><a href="{{ url('/Tutorial_Online') }}">Tutorial Online</a></li>
                             <li><a href="{{ url('/Tutorial_Webinar') }}">Tutorial Webinar</a></li>
                             <li><a href="{{ url('/Praktikum') }}">Praktikum</a></li>
                         </ul>
                     </li>
-                    <li><a href="{{ url('/gallery') }}">Gallery</a></li>
-                    <li><a href="{{ url('/contact') }}">Contact</a></li>
+                    <li><a href="{{ url('/gallery') }}">GALLERY</a></li>
+                    <li><a href="{{ url('/contact') }}">CONTACT</a></li>
+                    <li><a href="{{ url('/login') }}">LOGIN</a></li>
                 </ul>
             </nav>
         </div>

@@ -4,7 +4,7 @@
     <!-- Mobile Specific Meta -->
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Favicon-->
-    <link rel="shortcut icon" href="{{ asset('img/fav.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <!-- Author Meta -->
     <meta name="author" content="SALUT Insan Cendekia">
     <!-- Meta Description -->
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="{{ asset('css/jquery-ui.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 </head>
 <body>
     @include('partials.header')
@@ -52,5 +52,7 @@
     <script src="{{ asset('js/owl.carousel.min.js') }}"></script>
     <script src="{{ asset('js/mail-script.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
+    
+    @stack('scripts')
 </body>
 </html>
