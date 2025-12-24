@@ -480,62 +480,49 @@
             maxYearHint.textContent = maxAllowedYear;
         }
 
-        // Fungsi Validasi Dinamis
-        function validateAge() {
+        // Fungsi untuk menampilkan umur (UI feedback saja, validasi di backend)
+        function showAgeInfo() {
             const selectedDateStr = dateInput.value;
             if (!selectedDateStr) {
-                // Sembunyikan pesan jika tidak ada input
                 ageError.style.display = 'none';
                 ageSuccess.style.display = 'none';
                 dateInput.classList.remove('is-invalid', 'is-valid');
-                if (submitBtn) submitBtn.disabled = false;
-                return true;
+                return;
             }
 
             const birthDate = new Date(selectedDateStr);
             const today = new Date();
             
-            // Hitung umur secara presisi
             let age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
             
-            // Koreksi jika bulan/hari belum lewat di tahun berjalan
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
 
-            // Update tahun maksimal
             if (maxYearHint) {
                 maxYearHint.textContent = maxAllowedYear;
             }
 
-            // Reset state tampilan
             dateInput.classList.remove('is-invalid', 'is-valid');
             ageError.style.display = 'none';
             ageSuccess.style.display = 'none';
 
             if (age < 15) {
-                // JIKA TIDAK VALID
                 dateInput.classList.add('is-invalid');
                 ageError.style.display = 'block';
-                if (submitBtn) submitBtn.disabled = true;
-                return false;
             } else {
-                // JIKA VALID
                 if (calculatedAge) {
                     calculatedAge.textContent = age;
                 }
                 dateInput.classList.add('is-valid');
                 ageSuccess.style.display = 'block';
-                if (submitBtn) submitBtn.disabled = false;
-                return true;
             }
         }
 
-        // Jalankan validasi setiap kali nilai input berubah (Dinamis)
         if (dateInput) {
-            dateInput.addEventListener('change', validateAge);
-            dateInput.addEventListener('input', validateAge);
+            dateInput.addEventListener('change', showAgeInfo);
+            dateInput.addEventListener('input', showAgeInfo);
         }
 
         // ============================================
@@ -557,7 +544,7 @@
             if (captchaMessage) captchaMessage.textContent = '';
         }
 
-        function validateMathCaptcha() {
+        function checkCaptcha() {
             const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
             const messageEl = document.getElementById('captchaMessage');
             
@@ -565,13 +552,19 @@
                 messageEl.textContent = 'Captcha benar!';
                 messageEl.classList.remove('text-danger');
                 messageEl.classList.add('text-success');
-                return true;
-            } else {
-                messageEl.textContent = 'Captcha salah! Silakan coba lagi.';
+            } else if (document.getElementById('captchaAnswer').value) {
+                messageEl.textContent = 'Captcha salah!';
                 messageEl.classList.remove('text-success');
                 messageEl.classList.add('text-danger');
-                return false;
+            } else {
+                messageEl.textContent = '';
             }
+        }
+        
+        // Cek captcha saat user mengetik
+        const captchaAnswerInput = document.getElementById('captchaAnswer');
+        if (captchaAnswerInput) {
+            captchaAnswerInput.addEventListener('input', checkCaptcha);
         }
 
         // Generate captcha saat halaman dimuat
@@ -580,217 +573,9 @@
         // Expose function untuk tombol refresh captcha
         window.generateMathCaptcha = generateMathCaptcha;
 
-        // ============================================
-        // VALIDASI NIK
-        // ============================================
-        function validateNIK() {
-            const kewarganegaraanValue = kewarganegaraan ? kewarganegaraan.value : '';
-            
-            // Hanya validasi jika WNI
-            if (kewarganegaraanValue !== 'WNI') {
-                return true;
-            }
-            
-            const nikValue = nikInput ? nikInput.value : '';
-            
-            // Jika kosong, tidak perlu validasi (tidak wajib tampilkan error)
-            if (!nikValue) {
-                if (nikError) {
-                    nikError.textContent = 'NIK wajib diisi untuk WNI';
-                    nikError.classList.remove('d-none');
-                }
-                if (nikInput) {
-                    nikInput.classList.add('is-invalid');
-                    nikInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Validasi lebih dari 16 digit
-            if (nikValue.length > 16) {
-                if (nikError) {
-                    nikError.textContent = 'NIK maksimal 16 digit! Anda memasukkan ' + nikValue.length + ' digit';
-                    nikError.classList.remove('d-none');
-                }
-                if (nikInput) {
-                    nikInput.classList.add('is-invalid');
-                    nikInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Validasi kurang dari 16 digit
-            if (nikValue.length < 16) {
-                if (nikError) {
-                    nikError.textContent = 'NIK harus terdiri dari 16 digit angka';
-                    nikError.classList.remove('d-none');
-                }
-                if (nikInput) {
-                    nikInput.classList.add('is-invalid');
-                    nikInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Valid (tepat 16 digit)
-            if (nikError) nikError.classList.add('d-none');
-            if (nikInput) {
-                nikInput.classList.remove('is-invalid');
-                nikInput.classList.add('is-valid');
-            }
-            return true;
-        }
 
-        // ============================================
-        // VALIDASI NOMOR HP
-        // ============================================
-        function validateNoHp() {
-            const noHpInput = document.getElementById('no_hp');
-            const noHpValue = noHpInput ? noHpInput.value : '';
-            const noHpError = document.getElementById('noHpError');
-            
-            // Jika kosong, tidak perlu validasi (tidak wajib tampilkan error)
-            if (!noHpValue) {
-                if (noHpError) {
-                    noHpError.textContent = 'Nomor HP wajib diisi';
-                    noHpError.classList.remove('d-none');
-                }
-                if (noHpInput) {
-                    noHpInput.classList.add('is-invalid');
-                    noHpInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Validasi lebih dari 15 digit
-            if (noHpValue.length > 15) {
-                if (noHpError) {
-                    noHpError.textContent = 'Nomor HP maksimal 15 digit! Anda memasukkan ' + noHpValue.length + ' digit';
-                    noHpError.classList.remove('d-none');
-                }
-                if (noHpInput) {
-                    noHpInput.classList.add('is-invalid');
-                    noHpInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Validasi kurang dari 10 digit (minimal nomor HP Indonesia)
-            if (noHpValue.length < 10) {
-                if (noHpError) {
-                    noHpError.textContent = 'Nomor HP minimal 10 digit';
-                    noHpError.classList.remove('d-none');
-                }
-                if (noHpInput) {
-                    noHpInput.classList.add('is-invalid');
-                    noHpInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Valid (10-15 digit)
-            if (noHpError) noHpError.classList.add('d-none');
-            if (noHpInput) {
-                noHpInput.classList.remove('is-invalid');
-                noHpInput.classList.add('is-valid');
-            }
-            return true;
-        }
 
-        // ============================================
-        // VALIDASI PASSPORT
-        // ============================================
-        function validatePassport() {
-            const kewarganegaraanValue = kewarganegaraan ? kewarganegaraan.value : '';
-            
-            // Hanya validasi jika WNA
-            if (kewarganegaraanValue !== 'WNA') {
-                return true;
-            }
-            
-            const passportValue = passportInput ? passportInput.value : '';
-            
-            // Jika kosong, tidak perlu validasi (tidak wajib tampilkan error)
-            if (!passportValue) {
-                const passportError = document.getElementById('passportError');
-                if (passportError) {
-                    passportError.textContent = 'Nomor Passport wajib diisi untuk WNA';
-                    passportError.classList.remove('d-none');
-                }
-                if (passportInput) {
-                    passportInput.classList.add('is-invalid');
-                    passportInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Validasi lebih dari 15 karakter
-            if (passportValue.length > 15) {
-                const passportError = document.getElementById('passportError');
-                if (passportError) {
-                    passportError.textContent = 'Nomor Passport maksimal 15 karakter! Anda memasukkan ' + passportValue.length + ' karakter';
-                    passportError.classList.remove('d-none');
-                }
-                if (passportInput) {
-                    passportInput.classList.add('is-invalid');
-                    passportInput.classList.remove('is-valid');
-                }
-                return false;
-            }
-            
-            // Valid
-            const passportError = document.getElementById('passportError');
-            if (passportError) passportError.classList.add('d-none');
-            if (passportInput) {
-                passportInput.classList.remove('is-invalid');
-                passportInput.classList.add('is-valid');
-            }
-            return true;
-        }
 
-        // ============================================
-        // FORM SUBMIT VALIDATION
-        // ============================================
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                let isValid = true;
-                
-                if (!validateAge()) {
-                    e.preventDefault();
-                    dateInput.focus();
-                    isValid = false;
-                }
-                
-                if (!validateNIK()) {
-                    e.preventDefault();
-                    if (nikInput) nikInput.focus();
-                    isValid = false;
-                }
-                
-                if (!validatePassport()) {
-                    e.preventDefault();
-                    if (passportInput) passportInput.focus();
-                    isValid = false;
-                }
-                
-                if (!validateNoHp()) {
-                    e.preventDefault();
-                    const noHpInput = document.getElementById('no_hp');
-                    if (noHpInput) noHpInput.focus();
-                    isValid = false;
-                }
-                
-                if (!validateMathCaptcha()) {
-                    e.preventDefault();
-                    isValid = false;
-                }
-                
-                if (!isValid) {
-                    return false;
-                }
-            });
-        }
 
         // ============================================
         // KEWARGANEGARAAN & NIK / PASSPORT
@@ -842,7 +627,6 @@
                 if (nikTooltip) {
                     nikTooltip.classList.add('d-none');
                 }
-                validateNIK();
             });
             
             nikInput.addEventListener('input', function() {
@@ -927,7 +711,6 @@
                 if (passportTooltip) {
                     passportTooltip.classList.add('d-none');
                 }
-                validatePassport();
             });
             
             passportInput.addEventListener('input', function() {
@@ -999,7 +782,6 @@
                 if (noHpTooltip) {
                     noHpTooltip.classList.add('d-none');
                 }
-                validateNoHp();
             });
             
             noHpInput.addEventListener('input', function() {
