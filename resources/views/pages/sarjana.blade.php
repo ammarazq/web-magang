@@ -317,9 +317,27 @@
                 </select>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3 position-relative">
                 <label for="no_hp" class="form-label">No Handphone /WA</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Masukkan No Handphone / WA" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan no telepon altif yang terdaftar pada aplikasi WhatsApp" required>
+                <input type="text"
+                    class="form-control"
+                    id="no_hp"
+                    name="no_hp"
+                    placeholder="Masukkan No Handphone / WA">
+                
+                <!-- Tooltip Fixed Position -->
+                <div class="position-absolute d-none" id="noHpTooltip" style="top: 8px; right: -180px; z-index: 1000;">
+                    <div class="alert alert-info mb-0 py-2 px-3 shadow-sm" style="border-radius: 8px; font-size: 0.875rem;">
+                        <i class="fa fa-info-circle"></i> <strong>Maksimal 15 Digit</strong>
+                    </div>
+                </div>
+                
+                <small class="text-muted d-block mt-1" id="noHpHint">
+                    <i class="fa fa-info-circle"></i> <span id="noHpCounter">0</span>/15 digit
+                </small>
+                <small class="text-danger d-none" id="noHpError">
+                    Nomor HP harus berupa angka maksimal 15 digit
+                </small>
             </div>
 
             <div class="mb-3">
@@ -393,6 +411,53 @@
     </div>
 </div>
 
+<!-- Modal Persetujuan RPL -->
+<div class="modal fade" id="rplModal" tabindex="-1" aria-labelledby="rplModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: #003d82;">
+                <h5 class="modal-title fw-bold text-center w-100" id="rplModalLabel">Persetujuan</h5>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-3">Pengusulan RPL dikenakan biaya Rp300.000 dan biaya admisi Rp.100.000. Jika ajuan RPL calon mahasiswa tidak disetujui maka biaya RPL tidak dapat dikembalikan.</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="rplCheckbox">
+                    <label class="form-check-label" for="rplCheckbox">
+                        Saya Menyetujui
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-primary px-4" id="btnKembali">Kembali</button>
+                <button type="button" class="btn btn-primary px-4" id="btnOk" style="background-color: #6fa3dc; border-color: #6fa3dc;" disabled>Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Persetujuan Non RPL -->
+<div class="modal fade" id="nonRplModal" tabindex="-1" aria-labelledby="nonRplModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color: #003d82;">
+                <h5 class="modal-title fw-bold text-center w-100" id="nonRplModalLabel">Persetujuan</h5>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-3">Calon mahasiswa dikenakan biaya admisi Rp. 100.000.</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="nonRplCheckbox">
+                    <label class="form-check-label" for="nonRplCheckbox">
+                        Saya Menyetujui
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center gap-2">
+                <button type="button" class="btn btn-primary px-4" id="btnKembaliNonRpl">Kembali</button>
+                <button type="button" class="btn btn-primary px-4" id="btnOkNonRpl" style="background-color: #6fa3dc; border-color: #6fa3dc;" disabled>Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -577,6 +642,62 @@
         }
 
         // ============================================
+        // VALIDASI NOMOR HP
+        // ============================================
+        function validateNoHp() {
+            const noHpInput = document.getElementById('no_hp');
+            const noHpValue = noHpInput ? noHpInput.value : '';
+            const noHpError = document.getElementById('noHpError');
+            
+            // Jika kosong, tidak perlu validasi (tidak wajib tampilkan error)
+            if (!noHpValue) {
+                if (noHpError) {
+                    noHpError.textContent = 'Nomor HP wajib diisi';
+                    noHpError.classList.remove('d-none');
+                }
+                if (noHpInput) {
+                    noHpInput.classList.add('is-invalid');
+                    noHpInput.classList.remove('is-valid');
+                }
+                return false;
+            }
+            
+            // Validasi lebih dari 15 digit
+            if (noHpValue.length > 15) {
+                if (noHpError) {
+                    noHpError.textContent = 'Nomor HP maksimal 15 digit! Anda memasukkan ' + noHpValue.length + ' digit';
+                    noHpError.classList.remove('d-none');
+                }
+                if (noHpInput) {
+                    noHpInput.classList.add('is-invalid');
+                    noHpInput.classList.remove('is-valid');
+                }
+                return false;
+            }
+            
+            // Validasi kurang dari 10 digit (minimal nomor HP Indonesia)
+            if (noHpValue.length < 10) {
+                if (noHpError) {
+                    noHpError.textContent = 'Nomor HP minimal 10 digit';
+                    noHpError.classList.remove('d-none');
+                }
+                if (noHpInput) {
+                    noHpInput.classList.add('is-invalid');
+                    noHpInput.classList.remove('is-valid');
+                }
+                return false;
+            }
+            
+            // Valid (10-15 digit)
+            if (noHpError) noHpError.classList.add('d-none');
+            if (noHpInput) {
+                noHpInput.classList.remove('is-invalid');
+                noHpInput.classList.add('is-valid');
+            }
+            return true;
+        }
+
+        // ============================================
         // VALIDASI PASSPORT
         // ============================================
         function validatePassport() {
@@ -650,6 +771,13 @@
                 if (!validatePassport()) {
                     e.preventDefault();
                     if (passportInput) passportInput.focus();
+                    isValid = false;
+                }
+                
+                if (!validateNoHp()) {
+                    e.preventDefault();
+                    const noHpInput = document.getElementById('no_hp');
+                    if (noHpInput) noHpInput.focus();
                     isValid = false;
                 }
                 
@@ -850,8 +978,96 @@
         }
 
         // ============================================
+        // VALIDASI NOMOR HP INPUT
+        // ============================================
+        const noHpInput = document.getElementById('no_hp');
+        if (noHpInput) {
+            const noHpCounter = document.getElementById('noHpCounter');
+            const noHpHint = document.getElementById('noHpHint');
+            const noHpTooltip = document.getElementById('noHpTooltip');
+            const noHpError = document.getElementById('noHpError');
+            
+            // Tampilkan tooltip saat focus
+            noHpInput.addEventListener('focus', function() {
+                if (noHpTooltip) {
+                    noHpTooltip.classList.remove('d-none');
+                }
+            });
+            
+            // Sembunyikan tooltip saat blur
+            noHpInput.addEventListener('blur', function() {
+                if (noHpTooltip) {
+                    noHpTooltip.classList.add('d-none');
+                }
+                validateNoHp();
+            });
+            
+            noHpInput.addEventListener('input', function() {
+                // Hanya izinkan angka
+                this.value = this.value.replace(/\D/g, '');
+                
+                // Update counter
+                const currentLength = this.value.length;
+                if (noHpCounter) {
+                    noHpCounter.textContent = currentLength;
+                }
+                
+                // Update warna hint berdasarkan jumlah digit
+                if (noHpHint) {
+                    if (currentLength === 0) {
+                        noHpHint.className = 'text-muted d-block mt-1';
+                    } else if (currentLength < 10) {
+                        noHpHint.className = 'text-warning d-block mt-1 fw-bold';
+                    } else if (currentLength >= 10 && currentLength <= 15) {
+                        noHpHint.className = 'text-success d-block mt-1 fw-bold';
+                    } else if (currentLength > 15) {
+                        noHpHint.className = 'text-danger d-block mt-1 fw-bold';
+                    }
+                }
+                
+                // Tampilkan error hanya jika lebih dari 15 digit
+                if (currentLength > 15) {
+                    if (noHpError) {
+                        noHpError.textContent = 'Nomor HP maksimal 15 digit! Anda memasukkan ' + currentLength + ' digit';
+                        noHpError.classList.remove('d-none');
+                    }
+                    if (this) {
+                        this.classList.add('is-invalid');
+                        this.classList.remove('is-valid');
+                    }
+                } else if (currentLength >= 10 && currentLength <= 15) {
+                    // Valid (10-15 digit)
+                    if (noHpError) noHpError.classList.add('d-none');
+                    if (this) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                } else {
+                    // Kurang dari 10 - sembunyikan error, hapus validasi visual
+                    if (noHpError) noHpError.classList.add('d-none');
+                    if (this) {
+                        this.classList.remove('is-invalid', 'is-valid');
+                    }
+                }
+            });
+        }
+
+        // ============================================
         // JALUR PROGRAM
         // ============================================
+        const rplModalElement = document.getElementById('rplModal');
+        const nonRplModalElement = document.getElementById('nonRplModal');
+        let rplModalInstance = null;
+        let nonRplModalInstance = null;
+        
+        // Inisialisasi modal sekali saja
+        if (rplModalElement) {
+            rplModalInstance = new bootstrap.Modal(rplModalElement);
+        }
+        if (nonRplModalElement) {
+            nonRplModalInstance = new bootstrap.Modal(nonRplModalElement);
+        }
+
         document.querySelectorAll('.jalur-program').forEach(button => {
             button.addEventListener('click', function() {
                 const jalur = this.getAttribute('data-jalur');
@@ -864,8 +1080,137 @@
                 });
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
+                
+                // Jika RPL dipilih, tampilkan modal persetujuan RPL
+                if (jalur === 'RPL' && rplModalInstance) {
+                    rplModalInstance.show();
+                }
+                // Jika Non RPL dipilih, tampilkan modal persetujuan Non RPL
+                else if (jalur === 'Non RPL' && nonRplModalInstance) {
+                    nonRplModalInstance.show();
+                }
             });
         });
+
+        // ============================================
+        // MODAL RPL PERSETUJUAN
+        // ============================================
+        const rplCheckbox = document.getElementById('rplCheckbox');
+        const btnOk = document.getElementById('btnOk');
+        const btnKembali = document.getElementById('btnKembali');
+
+        // Enable/disable tombol Ok berdasarkan checkbox
+        if (rplCheckbox && btnOk) {
+            rplCheckbox.addEventListener('change', function() {
+                btnOk.disabled = !this.checked;
+            });
+        }
+
+        // Tombol Ok - tutup modal dan tetap di jalur RPL
+        if (btnOk) {
+            btnOk.addEventListener('click', function() {
+                // Tutup modal
+                if (rplModalInstance) {
+                    rplModalInstance.hide();
+                }
+                
+                // Reset checkbox untuk penggunaan selanjutnya
+                if (rplCheckbox) {
+                    rplCheckbox.checked = false;
+                }
+                btnOk.disabled = true;
+                
+                // Pilihan RPL tetap tersimpan (tidak direset)
+            });
+        }
+
+        // Tombol Kembali - reset pilihan jalur program dan tutup modal
+        if (btnKembali) {
+            btnKembali.addEventListener('click', function() {
+                // Reset pilihan jalur program
+                const jalurInput = document.getElementById('jalur_program');
+                if (jalurInput) jalurInput.value = '';
+                
+                // Reset semua tombol jalur program
+                document.querySelectorAll('.jalur-program').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+                
+                // Reset checkbox
+                if (rplCheckbox) {
+                    rplCheckbox.checked = false;
+                }
+                if (btnOk) {
+                    btnOk.disabled = true;
+                }
+                
+                // Tutup modal
+                if (rplModalInstance) {
+                    rplModalInstance.hide();
+                }
+            });
+        }
+
+        // ============================================
+        // MODAL NON RPL PERSETUJUAN
+        // ============================================
+        const nonRplCheckbox = document.getElementById('nonRplCheckbox');
+        const btnOkNonRpl = document.getElementById('btnOkNonRpl');
+        const btnKembaliNonRpl = document.getElementById('btnKembaliNonRpl');
+
+        // Enable/disable tombol Ok berdasarkan checkbox
+        if (nonRplCheckbox && btnOkNonRpl) {
+            nonRplCheckbox.addEventListener('change', function() {
+                btnOkNonRpl.disabled = !this.checked;
+            });
+        }
+
+        // Tombol Ok - tutup modal dan tetap di jalur Non RPL
+        if (btnOkNonRpl) {
+            btnOkNonRpl.addEventListener('click', function() {
+                // Tutup modal
+                if (nonRplModalInstance) {
+                    nonRplModalInstance.hide();
+                }
+                
+                // Reset checkbox untuk penggunaan selanjutnya
+                if (nonRplCheckbox) {
+                    nonRplCheckbox.checked = false;
+                }
+                btnOkNonRpl.disabled = true;
+                
+                // Pilihan Non RPL tetap tersimpan (tidak direset)
+            });
+        }
+
+        // Tombol Kembali - reset pilihan jalur program dan tutup modal
+        if (btnKembaliNonRpl) {
+            btnKembaliNonRpl.addEventListener('click', function() {
+                // Reset pilihan jalur program
+                const jalurInput = document.getElementById('jalur_program');
+                if (jalurInput) jalurInput.value = '';
+                
+                // Reset semua tombol jalur program
+                document.querySelectorAll('.jalur-program').forEach(btn => {
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline-primary');
+                });
+                
+                // Reset checkbox
+                if (nonRplCheckbox) {
+                    nonRplCheckbox.checked = false;
+                }
+                if (btnOkNonRpl) {
+                    btnOkNonRpl.disabled = true;
+                }
+                
+                // Tutup modal
+                if (nonRplModalInstance) {
+                    nonRplModalInstance.hide();
+                }
+            });
+        }
     });
 </script>
 @endpush
