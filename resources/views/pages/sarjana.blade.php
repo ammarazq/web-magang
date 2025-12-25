@@ -104,17 +104,13 @@
             <div class="mb-3">
                 <label for="tanggal_lahir" class="form-label">Tanggal Lahir <span class="text-danger">*</span></label>
                 <input type="date" 
-                    class="form-control @error('tanggal_lahir') is-invalid @enderror" 
+                    class="form-control" 
                     id="tanggal_lahir" 
                     name="tanggal_lahir" 
-                    value="{{ old('tanggal_lahir') }}" 
                     data-bs-toggle="tooltip" 
                     data-bs-placement="top" 
                     title="Usia minimal 15 tahun" 
                     required>
-                @error('tanggal_lahir')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
                 <div id="tanggalLahirError" class="text-danger mt-2 small fw-bold" style="display: none;">
                     <i class="fa fa-exclamation-circle"></i> Usia minimal 15 tahun! (Kelahiran maks: <span id="maxYearHint"></span>)
                 </div>
@@ -165,26 +161,15 @@
             </div>
 
             <!-- NIK untuk WNI -->
-            <div class="mb-3 d-none position-relative" id="nikWrapper">
+            <div class="mb-3 d-none" id="nikWrapper">
                 <label for="nik" class="form-label">NIK</label>
                 <input type="text"
                     class="form-control"
                     id="nik"
                     name="nik"
                     placeholder="Masukkan 16 digit NIK">
-                
-                <!-- Tooltip Fixed Position -->
-                <div class="position-absolute d-none" id="nikTooltip" style="top: 8px; right: -180px; z-index: 1000;">
-                    <div class="alert alert-info mb-0 py-2 px-3 shadow-sm" style="border-radius: 8px; font-size: 0.875rem;">
-                        <i class="fa fa-info-circle"></i> <strong>Maksimal 16 Karakter</strong>
-                    </div>
-                </div>
-                
                 <small class="text-muted d-block mt-1" id="nikHint">
                     <i class="fa fa-info-circle"></i> <span id="nikCounter">0</span>/16 digit
-                </small>
-                <small class="text-danger d-none" id="nikError">
-                    NIK harus terdiri dari 16 digit angka
                 </small>
             </div>
 
@@ -207,26 +192,15 @@
                 </select>
             </div>
 
-            <div class="mb-3 d-none position-relative" id="passportWrapper">
+            <div class="mb-3 d-none" id="passportWrapper">
                 <label for="passport" class="form-label">Nomor Passport</label>
                 <input type="text"
                     class="form-control"
                     id="passport"
                     name="passport"
                     placeholder="Masukkan Nomor Passport">
-                
-                <!-- Tooltip Fixed Position -->
-                <div class="position-absolute d-none" id="passportTooltip" style="top: 8px; right: -180px; z-index: 1000;">
-                    <div class="alert alert-info mb-0 py-2 px-3 shadow-sm" style="border-radius: 8px; font-size: 0.875rem;">
-                        <i class="fa fa-info-circle"></i> <strong>Maksimal 15 Karakter</strong>
-                    </div>
-                </div>
-                
                 <small class="text-muted d-block mt-1" id="passportHint">
-                    <i class="fa fa-info-circle"></i> <span id="passportCounter">0</span>/15 digit
-                </small>
-                <small class="text-danger d-none" id="passportError">
-                    Nomor Passport maksimal 15 karakter
+                    <i class="fa fa-info-circle"></i> <span id="passportCounter">0</span>/15 karakter (min: 6)
                 </small>
             </div>
 
@@ -317,26 +291,16 @@
                 </select>
             </div>
 
-            <div class="mb-3 position-relative">
+            <div class="mb-3">
                 <label for="no_hp" class="form-label">No Handphone /WA</label>
                 <input type="text"
                     class="form-control"
                     id="no_hp"
                     name="no_hp"
-                    placeholder="Masukkan No Handphone / WA">
-                
-                <!-- Tooltip Fixed Position -->
-                <div class="position-absolute d-none" id="noHpTooltip" style="top: 8px; right: -180px; z-index: 1000;">
-                    <div class="alert alert-info mb-0 py-2 px-3 shadow-sm" style="border-radius: 8px; font-size: 0.875rem;">
-                        <i class="fa fa-info-circle"></i> <strong>Maksimal 15 Digit</strong>
-                    </div>
-                </div>
-                
+                    placeholder="Masukkan No Handphone / WA"
+                    required>
                 <small class="text-muted d-block mt-1" id="noHpHint">
-                    <i class="fa fa-info-circle"></i> <span id="noHpCounter">0</span>/15 digit
-                </small>
-                <small class="text-danger d-none" id="noHpError">
-                    Nomor HP harus berupa angka maksimal 15 digit
+                    <i class="fa fa-info-circle"></i> <span id="noHpCounter">0</span>/15 digit (min: 10)
                 </small>
             </div>
 
@@ -371,7 +335,6 @@
                         <i class="fa fa-refresh"></i>
                     </button>
                 </div>
-                <small id="captchaMessage" class="text-danger mt-2 d-block"></small>
             </div>
 
             <button type="submit" class="btn btn-success mt-3">Submit</button>
@@ -387,7 +350,6 @@
                 <h5 class="modal-title" id="nikModalLabel">
                     <i class="fa fa-id-card"></i> Konfirmasi NIK
                 </h5>
-                <!-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button> -->
             </div>
             <div class="modal-body text-center py-4">
                 <div class="mb-3">
@@ -400,11 +362,64 @@
                 <p class="text-muted small mb-0">Pastikan NIK yang Anda masukkan sudah benar</p>
             </div>
             <div class="modal-footer justify-content-center">
-                <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-edit"></i> Edit
-                </button> -->
                 <!-- <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                    <i class="fa fa-check"></i> Benar
+                    <i class="fa fa-check"></i> OK
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Passport -->
+<div class="modal fade" id="passportModal" tabindex="-1" aria-labelledby="passportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="passportModalLabel">
+                    <i class="fa fa-passport"></i> Konfirmasi Passport
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fa fa-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Nomor Passport yang Anda masukkan:</h6>
+                <div class="alert alert-info py-3">
+                    <h4 class="mb-0 fw-bold" id="passportModalText"></h4>
+                </div>
+                <p class="text-muted small mb-0">Pastikan nomor passport yang Anda masukkan sudah benar</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <!-- <button type="button" class="btn btn-info" data-bs-dismiss="modal">
+                    <i class="fa fa-check"></i> OK
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Nomor HP -->
+<div class="modal fade" id="noHpModal" tabindex="-1" aria-labelledby="noHpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="noHpModalLabel">
+                    <i class="fa fa-phone"></i> Konfirmasi Nomor HP
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fa fa-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Nomor HP/WA yang Anda masukkan:</h6>
+                <div class="alert alert-info py-3">
+                    <h4 class="mb-0 fw-bold" id="noHpModalText"></h4>
+                </div>
+                <p class="text-muted small mb-0">Pastikan nomor HP/WA yang Anda masukkan sudah benar</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <!-- <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fa fa-check"></i> OK
                 </button> -->
             </div>
         </div>
@@ -462,16 +477,15 @@
 
 @push('scripts')
 <script>
-    // ============================================
-    // VALIDASI TANGGAL LAHIR DINAMIS
-    // ============================================
     document.addEventListener('DOMContentLoaded', function() {
+        // ============================================
+        // VALIDASI TANGGAL LAHIR (UI FEEDBACK ONLY)
+        // ============================================
         const dateInput = document.getElementById('tanggal_lahir');
         const ageError = document.getElementById('tanggalLahirError');
         const ageSuccess = document.getElementById('tanggalLahirSuccess');
         const maxYearHint = document.getElementById('maxYearHint');
         const calculatedAge = document.getElementById('calculatedAge');
-        const submitBtn = document.querySelector('button[type="submit"]');
 
         // Hitung batas tahun minimal (Tahun berjalan - 15)
         const currentYear = new Date().getFullYear();
@@ -480,13 +494,12 @@
             maxYearHint.textContent = maxAllowedYear;
         }
 
-        // Fungsi untuk menampilkan umur (UI feedback saja, validasi di backend)
+        // Fungsi untuk menampilkan umur (UI feedback, validasi tetap di backend)
         function showAgeInfo() {
             const selectedDateStr = dateInput.value;
             if (!selectedDateStr) {
                 ageError.style.display = 'none';
                 ageSuccess.style.display = 'none';
-                dateInput.classList.remove('is-invalid', 'is-valid');
                 return;
             }
 
@@ -500,22 +513,15 @@
                 age--;
             }
 
-            if (maxYearHint) {
-                maxYearHint.textContent = maxAllowedYear;
-            }
-
-            dateInput.classList.remove('is-invalid', 'is-valid');
             ageError.style.display = 'none';
             ageSuccess.style.display = 'none';
 
             if (age < 15) {
-                dateInput.classList.add('is-invalid');
                 ageError.style.display = 'block';
             } else {
                 if (calculatedAge) {
                     calculatedAge.textContent = age;
                 }
-                dateInput.classList.add('is-valid');
                 ageSuccess.style.display = 'block';
             }
         }
@@ -526,45 +532,17 @@
         }
 
         // ============================================
-        // CAPTCHA
+        // CAPTCHA GENERATION
         // ============================================
-        let correctAnswer = 18;
-
         function generateMathCaptcha() {
             const num1 = Math.floor(Math.random() * 20) + 1;
             const num2 = Math.floor(Math.random() * 20) + 1;
-            correctAnswer = num1 + num2;
             
             const captchaQuestion = document.getElementById('captchaQuestion');
             const captchaAnswer = document.getElementById('captchaAnswer');
-            const captchaMessage = document.getElementById('captchaMessage');
             
             if (captchaQuestion) captchaQuestion.textContent = num1 + ' + ' + num2;
             if (captchaAnswer) captchaAnswer.value = '';
-            if (captchaMessage) captchaMessage.textContent = '';
-        }
-
-        function checkCaptcha() {
-            const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
-            const messageEl = document.getElementById('captchaMessage');
-            
-            if (userAnswer === correctAnswer) {
-                messageEl.textContent = 'Captcha benar!';
-                messageEl.classList.remove('text-danger');
-                messageEl.classList.add('text-success');
-            } else if (document.getElementById('captchaAnswer').value) {
-                messageEl.textContent = 'Captcha salah!';
-                messageEl.classList.remove('text-success');
-                messageEl.classList.add('text-danger');
-            } else {
-                messageEl.textContent = '';
-            }
-        }
-        
-        // Cek captcha saat user mengetik
-        const captchaAnswerInput = document.getElementById('captchaAnswer');
-        if (captchaAnswerInput) {
-            captchaAnswerInput.addEventListener('input', checkCaptcha);
         }
 
         // Generate captcha saat halaman dimuat
@@ -573,22 +551,16 @@
         // Expose function untuk tombol refresh captcha
         window.generateMathCaptcha = generateMathCaptcha;
 
-
-
-
-
         // ============================================
-        // KEWARGANEGARAAN & NIK / PASSPORT
+        // KEWARGANEGARAAN - SHOW/HIDE FIELDS
         // ============================================
         const kewarganegaraan = document.getElementById('kewarganegaraan');
         const negaraWrapper = document.getElementById('pilihNegaraWrapper');
         const passportWrapper = document.getElementById('passportWrapper');
         const nikWrapper = document.getElementById('nikWrapper');
         const nikInput = document.getElementById('nik');
-        const nikError = document.getElementById('nikError');
         const passportInput = document.getElementById('passport');
         
-
         if (kewarganegaraan) {
             kewarganegaraan.addEventListener('change', function() {
                 // Reset semua field
@@ -597,7 +569,6 @@
                 if (nikWrapper) nikWrapper.classList.add('d-none');
                 if (nikInput) nikInput.value = '';
                 if (passportInput) passportInput.value = '';
-                if (nikError) nikError.classList.add('d-none');
                 
                 if (this.value === 'WNI') {
                     // Tampilkan NIK untuk WNI
@@ -610,28 +581,21 @@
             });
         }
 
+        // ============================================
+        // NIK INPUT - COUNTER & MODAL
+        // ============================================
         if (nikInput) {
             const nikCounter = document.getElementById('nikCounter');
             const nikHint = document.getElementById('nikHint');
-            const nikTooltip = document.getElementById('nikTooltip');
-            
-            // Tampilkan tooltip saat focus
-            nikInput.addEventListener('focus', function() {
-                if (nikTooltip) {
-                    nikTooltip.classList.remove('d-none');
-                }
-            });
-            
-            // Sembunyikan tooltip saat blur
-            nikInput.addEventListener('blur', function() {
-                if (nikTooltip) {
-                    nikTooltip.classList.add('d-none');
-                }
-            });
             
             nikInput.addEventListener('input', function() {
                 // Hanya izinkan angka
                 this.value = this.value.replace(/\D/g, '');
+                
+                // Batasi maksimal 16 digit
+                if (this.value.length > 16) {
+                    this.value = this.value.substring(0, 16);
+                }
                 
                 // Update counter
                 const currentLength = this.value.length;
@@ -647,73 +611,37 @@
                         nikHint.className = 'text-warning d-block mt-1 fw-bold';
                     } else if (currentLength === 16) {
                         nikHint.className = 'text-success d-block mt-1 fw-bold';
-                    } else if (currentLength > 16) {
-                        nikHint.className = 'text-danger d-block mt-1 fw-bold';
                     }
                 }
                 
-                // Tampilkan error hanya jika lebih dari 16 digit
-                if (currentLength > 16) {
-                    if (nikError) {
-                        nikError.textContent = 'NIK maksimal 16 digit! Anda memasukkan ' + currentLength + ' digit';
-                        nikError.classList.remove('d-none');
-                    }
-                    if (this) {
-                        this.classList.add('is-invalid');
-                        this.classList.remove('is-valid');
-                    }
-                } else if (currentLength === 16) {
-                    // Tepat 16 digit - valid
-                    if (nikError) nikError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    }
-                    
-                    // Tampilkan modal
+                // Tampilkan modal saat tepat 16 digit
+                if (currentLength === 16) {
                     const nikModalText = document.getElementById('nikModalText');
                     if (nikModalText) {
-                        nikModalText.innerText = 'NIK anda adalah ' + this.value;
+                        nikModalText.innerText = this.value;
                     }
 
                     const nikModal = document.getElementById('nikModal');
                     if (nikModal) {
                         new bootstrap.Modal(nikModal).show();
                     }
-                } else {
-                    // Kurang dari 16 - sembunyikan error, hapus validasi visual
-                    if (nikError) nikError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid', 'is-valid');
-                    }
                 }
             });
         }
 
         // ============================================
-        // VALIDASI PASSPORT INPUT
+        // PASSPORT INPUT - COUNTER & MODAL
         // ============================================
         if (passportInput) {
             const passportCounter = document.getElementById('passportCounter');
             const passportHint = document.getElementById('passportHint');
-            const passportTooltip = document.getElementById('passportTooltip');
-            const passportError = document.getElementById('passportError');
-            
-            // Tampilkan tooltip saat focus
-            passportInput.addEventListener('focus', function() {
-                if (passportTooltip) {
-                    passportTooltip.classList.remove('d-none');
-                }
-            });
-            
-            // Sembunyikan tooltip saat blur
-            passportInput.addEventListener('blur', function() {
-                if (passportTooltip) {
-                    passportTooltip.classList.add('d-none');
-                }
-            });
             
             passportInput.addEventListener('input', function() {
+                // Batasi maksimal 15 karakter
+                if (this.value.length > 15) {
+                    this.value = this.value.substring(0, 15);
+                }
+                
                 // Update counter
                 const currentLength = this.value.length;
                 if (passportCounter) {
@@ -724,69 +652,53 @@
                 if (passportHint) {
                     if (currentLength === 0) {
                         passportHint.className = 'text-muted d-block mt-1';
-                    } else if (currentLength < 15) {
+                    } else if (currentLength < 6) {
                         passportHint.className = 'text-warning d-block mt-1 fw-bold';
-                    } else if (currentLength === 15) {
+                    } else if (currentLength >= 6 && currentLength <= 15) {
                         passportHint.className = 'text-success d-block mt-1 fw-bold';
-                    } else if (currentLength > 15) {
-                        passportHint.className = 'text-danger d-block mt-1 fw-bold';
                     }
                 }
                 
-                // Tampilkan error hanya jika lebih dari 15 karakter
-                if (currentLength > 15) {
-                    if (passportError) {
-                        passportError.textContent = 'Nomor Passport maksimal 15 karakter! Anda memasukkan ' + currentLength + ' karakter';
-                        passportError.classList.remove('d-none');
+                // Tampilkan modal saat minimal 6 karakter (valid)
+                if (currentLength >= 6 && currentLength <= 15) {
+                    // Tampilkan modal hanya saat mencapai panjang tertentu (misal 6, 8, 10, dll)
+                    // Atau bisa saat blur/kehilangan fokus
+                }
+            });
+
+            // Tampilkan modal saat user selesai input (blur)
+            passportInput.addEventListener('blur', function() {
+                const currentLength = this.value.length;
+                if (currentLength >= 6 && currentLength <= 15) {
+                    const passportModalText = document.getElementById('passportModalText');
+                    if (passportModalText) {
+                        passportModalText.innerText = this.value;
                     }
-                    if (this) {
-                        this.classList.add('is-invalid');
-                        this.classList.remove('is-valid');
-                    }
-                } else if (currentLength >= 6 && currentLength <= 15) {
-                    // Valid (minimal 6, maksimal 15 karakter)
-                    if (passportError) passportError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    }
-                } else {
-                    // Kurang dari 6 - sembunyikan error, hapus validasi visual
-                    if (passportError) passportError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid', 'is-valid');
+
+                    const passportModal = document.getElementById('passportModal');
+                    if (passportModal && this.value) {
+                        new bootstrap.Modal(passportModal).show();
                     }
                 }
             });
         }
 
         // ============================================
-        // VALIDASI NOMOR HP INPUT
+        // NOMOR HP INPUT - COUNTER & MODAL
         // ============================================
         const noHpInput = document.getElementById('no_hp');
         if (noHpInput) {
             const noHpCounter = document.getElementById('noHpCounter');
             const noHpHint = document.getElementById('noHpHint');
-            const noHpTooltip = document.getElementById('noHpTooltip');
-            const noHpError = document.getElementById('noHpError');
-            
-            // Tampilkan tooltip saat focus
-            noHpInput.addEventListener('focus', function() {
-                if (noHpTooltip) {
-                    noHpTooltip.classList.remove('d-none');
-                }
-            });
-            
-            // Sembunyikan tooltip saat blur
-            noHpInput.addEventListener('blur', function() {
-                if (noHpTooltip) {
-                    noHpTooltip.classList.add('d-none');
-                }
-            });
             
             noHpInput.addEventListener('input', function() {
                 // Hanya izinkan angka
                 this.value = this.value.replace(/\D/g, '');
+                
+                // Batasi maksimal 15 digit
+                if (this.value.length > 15) {
+                    this.value = this.value.substring(0, 15);
+                }
                 
                 // Update counter
                 const currentLength = this.value.length;
@@ -802,41 +714,31 @@
                         noHpHint.className = 'text-warning d-block mt-1 fw-bold';
                     } else if (currentLength >= 10 && currentLength <= 15) {
                         noHpHint.className = 'text-success d-block mt-1 fw-bold';
-                    } else if (currentLength > 15) {
-                        noHpHint.className = 'text-danger d-block mt-1 fw-bold';
                     }
                 }
-                
-                // Tampilkan error hanya jika lebih dari 15 digit
-                if (currentLength > 15) {
-                    if (noHpError) {
-                        noHpError.textContent = 'Nomor HP maksimal 15 digit! Anda memasukkan ' + currentLength + ' digit';
-                        noHpError.classList.remove('d-none');
+            });
+
+            // Tampilkan modal saat user selesai input (blur) dan valid
+            noHpInput.addEventListener('blur', function() {
+                const currentLength = this.value.length;
+                if (currentLength >= 10 && currentLength <= 15) {
+                    const noHpModalText = document.getElementById('noHpModalText');
+                    if (noHpModalText) {
+                        noHpModalText.innerText = this.value;
                     }
-                    if (this) {
-                        this.classList.add('is-invalid');
-                        this.classList.remove('is-valid');
-                    }
-                } else if (currentLength >= 10 && currentLength <= 15) {
-                    // Valid (10-15 digit)
-                    if (noHpError) noHpError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid');
-                        this.classList.add('is-valid');
-                    }
-                } else {
-                    // Kurang dari 10 - sembunyikan error, hapus validasi visual
-                    if (noHpError) noHpError.classList.add('d-none');
-                    if (this) {
-                        this.classList.remove('is-invalid', 'is-valid');
+
+                    const noHpModal = document.getElementById('noHpModal');
+                    if (noHpModal && this.value) {
+                        new bootstrap.Modal(noHpModal).show();
                     }
                 }
             });
         }
 
         // ============================================
-        // JALUR PROGRAM
+        // JALUR PROGRAM - BUTTON SELECTION
         // ============================================
+
         const rplModalElement = document.getElementById('rplModal');
         const nonRplModalElement = document.getElementById('nonRplModal');
         let rplModalInstance = null;

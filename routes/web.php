@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UmurController;
+use App\Http\Controllers\SarjanaController;
 
 // Homepage
 Route::get('/', function () {
@@ -98,12 +99,8 @@ Route::get('/Praktikum', function () {
 })->name('praktikum');
 
 // Pendaftaran Routes (dari layanan_registrasi)
-Route::get('/sarjana', function () {
-    return view('pages.sarjana');
-})->name('sarjana');
-
-Route::post('/sarjana/submit', [UmurController::class, 'submit'])
-    ->name('sarjana.submit');
+Route::get('/sarjana', [SarjanaController::class, 'show'])->name('sarjana');
+Route::post('/sarjana/submit', [SarjanaController::class, 'submit'])->name('sarjana.submit');
 
 Route::get('/magister', function () {
     return view('pages.magister');

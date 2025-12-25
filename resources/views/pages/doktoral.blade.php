@@ -68,10 +68,10 @@
 
             <div class="card mx-3" style="width: 18rem;">
                 <div class="card-body">
-                    <h5 class="card-title text-center">Doktoral</h5>
+                    <h5 class="card-title text-center">Magister</h5>
                     <p class="card-text text-center">S2</p>
                     <div class="d-flex justify-content-center">
-                        <a href="{{ url('/doktoral') }}" class="btn btn-outline-primary">Selengkapnya</a>
+                        <a href="{{ url('/magister') }}" class="btn btn-outline-primary">Selengkapnya</a>
                     </div>
                 </div>
             </div>
@@ -154,7 +154,10 @@
 
             <div class="mb-3">
                 <label for="nik" class="form-label">NIK</label>
-                <input type="text" class="form-control" id="nik" name="nik" placeholder="Masukkan NIK" maxlength="16" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan Nomor Induk Kependudukan Anda" required>
+                <input type="text" class="form-control" id="nik" name="nik" placeholder="Masukkan NIK" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan Nomor Induk Kependudukan Anda" required>
+                <small class="text-muted d-block mt-1" id="nikHint">
+                    <i class="fa fa-info-circle"></i> <span id="nikCounter">0</span>/16 digit
+                </small>
             </div>
 
             <div class="mb-3">
@@ -173,7 +176,10 @@
 
             <div class="mb-3">
                 <label for="no_hp" class="form-label">No Handphone /WA</label>
-                <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="Masukkan No Handphone / WA" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan no telepon altif yang terdaftar pada aplikasi WhatsApp" required>
+                <input type="text" class="form-control" id="no_hp" name="no_hp" placeholder="Masukkan No Handphone / WA" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan no telepon aktif yang terdaftar pada aplikasi WhatsApp" required>
+                <small class="text-muted d-block mt-1" id="noHpHint">
+                    <i class="fa fa-info-circle"></i> <span id="noHpCounter">0</span>/15 digit (min: 10)
+                </small>
             </div>
 
             <div class="mb-3">
@@ -211,6 +217,62 @@
 
             <button type="submit" class="btn btn-success mt-3">Submit</button>
         </form>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi NIK -->
+<div class="modal fade" id="nikModal" tabindex="-1" aria-labelledby="nikModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="nikModalLabel">
+                    <i class="fa fa-id-card"></i> Konfirmasi NIK
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fa fa-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">NIK yang Anda masukkan:</h6>
+                <div class="alert alert-info py-3">
+                    <h4 class="mb-0 fw-bold" id="nikModalText"></h4>
+                </div>
+                <p class="text-muted small mb-0">Pastikan NIK yang Anda masukkan sudah benar</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <!-- <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fa fa-check"></i> OK
+                </button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Nomor HP -->
+<div class="modal fade" id="noHpModal" tabindex="-1" aria-labelledby="noHpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="noHpModalLabel">
+                    <i class="fa fa-phone"></i> Konfirmasi Nomor HP
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fa fa-check-circle text-success" style="font-size: 3rem;"></i>
+                </div>
+                <h6 class="mb-3">Nomor HP/WA yang Anda masukkan:</h6>
+                <div class="alert alert-info py-3">
+                    <h4 class="mb-0 fw-bold" id="noHpModalText"></h4>
+                </div>
+                <p class="text-muted small mb-0">Pastikan nomor HP/WA yang Anda masukkan sudah benar</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <!-- <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <i class="fa fa-check"></i> OK
+                </button> -->
+            </div>
+        </div>
     </div>
 </div>
 
@@ -324,6 +386,107 @@
 
         generateMathCaptcha();
         window.generateMathCaptcha = generateMathCaptcha;
+
+        // ============================================
+        // NIK INPUT - COUNTER & MODAL
+        // ============================================
+        const nikInput = document.getElementById('nik');
+        if (nikInput) {
+            const nikCounter = document.getElementById('nikCounter');
+            const nikHint = document.getElementById('nikHint');
+            
+            nikInput.addEventListener('input', function() {
+                // Hanya izinkan angka
+                this.value = this.value.replace(/\D/g, '');
+                
+                // Batasi maksimal 16 digit
+                if (this.value.length > 16) {
+                    this.value = this.value.substring(0, 16);
+                }
+                
+                // Update counter
+                const currentLength = this.value.length;
+                if (nikCounter) {
+                    nikCounter.textContent = currentLength;
+                }
+                
+                // Update warna hint berdasarkan jumlah karakter
+                if (nikHint) {
+                    if (currentLength === 0) {
+                        nikHint.className = 'text-muted d-block mt-1';
+                    } else if (currentLength < 16) {
+                        nikHint.className = 'text-warning d-block mt-1 fw-bold';
+                    } else if (currentLength === 16) {
+                        nikHint.className = 'text-success d-block mt-1 fw-bold';
+                    }
+                }
+                
+                // Tampilkan modal saat tepat 16 digit
+                if (currentLength === 16) {
+                    const nikModalText = document.getElementById('nikModalText');
+                    if (nikModalText) {
+                        nikModalText.innerText = this.value;
+                    }
+
+                    const nikModal = document.getElementById('nikModal');
+                    if (nikModal) {
+                        new bootstrap.Modal(nikModal).show();
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // NOMOR HP INPUT - COUNTER & MODAL
+        // ============================================
+        const noHpInput = document.getElementById('no_hp');
+        if (noHpInput) {
+            const noHpCounter = document.getElementById('noHpCounter');
+            const noHpHint = document.getElementById('noHpHint');
+            
+            noHpInput.addEventListener('input', function() {
+                // Hanya izinkan angka
+                this.value = this.value.replace(/\D/g, '');
+                
+                // Batasi maksimal 15 digit
+                if (this.value.length > 15) {
+                    this.value = this.value.substring(0, 15);
+                }
+                
+                // Update counter
+                const currentLength = this.value.length;
+                if (noHpCounter) {
+                    noHpCounter.textContent = currentLength;
+                }
+                
+                // Update warna hint berdasarkan jumlah digit
+                if (noHpHint) {
+                    if (currentLength === 0) {
+                        noHpHint.className = 'text-muted d-block mt-1';
+                    } else if (currentLength < 10) {
+                        noHpHint.className = 'text-warning d-block mt-1 fw-bold';
+                    } else if (currentLength >= 10 && currentLength <= 15) {
+                        noHpHint.className = 'text-success d-block mt-1 fw-bold';
+                    }
+                }
+            });
+
+            // Tampilkan modal saat user selesai input (blur) dan valid
+            noHpInput.addEventListener('blur', function() {
+                const currentLength = this.value.length;
+                if (currentLength >= 10 && currentLength <= 15) {
+                    const noHpModalText = document.getElementById('noHpModalText');
+                    if (noHpModalText) {
+                        noHpModalText.innerText = this.value;
+                    }
+
+                    const noHpModal = document.getElementById('noHpModal');
+                    if (noHpModal && this.value) {
+                        new bootstrap.Modal(noHpModal).show();
+                    }
+                }
+            });
+        }
 
         // ============================================
         // FORM SUBMIT & PASSWORD VALIDATION
