@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UmurController;
 use App\Http\Controllers\SarjanaController;
+use App\Http\Controllers\MagisterController;
+use App\Http\Controllers\DoktoralController;
 
 // Homepage
 Route::get('/', function () {
@@ -101,17 +103,12 @@ Route::get('/Praktikum', function () {
 // Pendaftaran Routes (dari layanan_registrasi)
 Route::get('/sarjana', [SarjanaController::class, 'show'])->name('sarjana');
 Route::post('/sarjana/submit', [SarjanaController::class, 'submit'])->name('sarjana.submit');
+Route::get('/sarjana/captcha/refresh', [SarjanaController::class, 'generateCaptcha'])->name('sarjana.captcha.refresh');
 
-Route::get('/magister', function () {
-    return view('pages.magister');
-})->name('magister');
+Route::get('/magister', [MagisterController::class, 'index'])->name('magister');
+Route::post('/magister/submit', [MagisterController::class, 'submit'])->name('magister.submit');
+Route::get('/magister/captcha/refresh', [MagisterController::class, 'generateCaptcha'])->name('magister.captcha.refresh');
 
-Route::post('/magister/submit', [UmurController::class, 'submit'])
-    ->name('magister.submit');
-
-Route::get('/doktoral', function () {
-    return view('pages.doktoral');
-})->name('doktoral');
-
-Route::post('/doktoral/submit', [UmurController::class, 'submit'])
-    ->name('doktoral.submit');
+Route::get('/doktoral', [DoktoralController::class, 'index'])->name('doktoral');
+Route::post('/doktoral/submit', [DoktoralController::class, 'submit'])->name('doktoral.submit');
+Route::get('/doktoral/captcha/refresh', [DoktoralController::class, 'generateCaptcha'])->name('doktoral.captcha.refresh');

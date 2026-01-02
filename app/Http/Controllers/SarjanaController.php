@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use App\Models\Mahasiswa;
 
 class SarjanaController extends Controller
 {
@@ -13,7 +14,34 @@ class SarjanaController extends Controller
      */
     public function show()
     {
+        // Generate CAPTCHA baru saat pertama kali load
+        $this->generateCaptcha();
         return view('pages.sarjana');
+    }
+
+    /**
+     * Generate CAPTCHA dan simpan di session
+     */
+    public function generateCaptcha()
+    {
+        // Generate dua angka acak antara 1-50
+        $num1 = rand(1, 50);
+        $num2 = rand(1, 50);
+        
+        // Hitung hasil penjumlahan
+        $result = $num1 + $num2;
+        
+        // Simpan di session
+        session([
+            'captcha_sarjana_num1' => $num1,
+            'captcha_sarjana_num2' => $num2,
+            'captcha_sarjana_result' => $result
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'question' => $num1 . ' + ' . $num2
+        ]);
     }
 
     /**
@@ -49,7 +77,7 @@ class SarjanaController extends Controller
             'jenjang'         => 'required|in:D3,D4,S1',
             'program_studi'   => 'required|string',
             'no_hp'           => 'required|numeric|digits_between:10,15',
-            'email'           => 'required|email|max:255|unique:users,email',
+            'email'           => 'required|email|max:255|unique:mahasiswa,email',
             'password'        => 'required|min:8|confirmed',
             'captcha_answer'  => 'required|numeric',
         ];
@@ -93,7 +121,7 @@ class SarjanaController extends Controller
                 'required',
                 'numeric',
                 'digits:16',
-                'unique:users,nik'
+                'unique:mahasiswa,nik'
             ];
             $messages['nik.required'] = 'NIK wajib diisi untuk WNI.';
             $messages['nik.numeric'] = 'NIK harus berupa angka.';
@@ -109,7 +137,7 @@ class SarjanaController extends Controller
                 'string',
                 'min:6',
                 'max:15',
-                'unique:users,passport'
+                'unique:mahasiswa,passport'
             ];
             $messages['negara.required'] = 'Negara asal wajib dipilih untuk WNA.';
             $messages['passport.required'] = 'Nomor passport wajib diisi untuk WNA.';
@@ -122,13 +150,48 @@ class SarjanaController extends Controller
         $validated = $request->validate($rules, $messages);
 
         /* ===============================
-           HASH PASSWORD
+           VALIDASI CAPTCHA
         =============================== */
-        $validated['password'] = Hash::make($validated['password']);
+        $captchaResult = session('captcha_sarjana_result');
+        $userAnswer = (int) $request->captcha_answer;
 
-        // ❗ Simpan ke database jika perlu
-        // Sarjana::create($validated);
+        if (!$captchaResult || $userAnswer !== $captchaResult) {
+            // Hapus session CAPTCHA lama
+            session()->forget(['captcha_sarjana_num1', 'captcha_sarjana_num2', 'captcha_sarjana_result']);
+            
+            // Generate CAPTCHA baru
+            $this->generateCaptcha();
+            
+            return redirect()->back()
+                ->withErrors(['captcha_answer' => 'Jawaban CAPTCHA salah! Silakan coba lagi.'])
+                ->withInput($request->except('captcha_answer'));
+        }
 
-        return back()->with('success', 'Pendaftaran Sarjana berhasil! Data Anda telah tersimpan.');
+        // Jika CAPTCHA benar, hapus session CAPTCHA
+        session()->forget(['captcha_sarjana_num1', 'captcha_sarjana_num2', 'captcha_sarjana_result']);
+
+        /* ===============================
+           SIMPAN KE DATABASE
+        =============================== */
+        try {
+            // Set jenis pendaftaran
+            $validated['jenis_pendaftaran'] = 'sarjana';
+            
+            // Set default status
+            $validated['status_verifikasi'] = 'pending';
+            
+            // Hash password
+            $validated['password'] = Hash::make($validated['password']);
+            
+            // Simpan ke database
+            $mahasiswa = Mahasiswa::create($validated);
+            
+            return redirect()->route('sarjana')
+                ->with('success', 'Pendaftaran berhasil! Data Anda telah tersimpan dengan No. Registrasi: ' . $mahasiswa->id);
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'])
+                ->withInput($request->except('password', 'password_confirmation'));
+        }
     }
 }

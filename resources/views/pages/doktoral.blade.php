@@ -200,19 +200,27 @@
                 <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Masukkan Konfirmasi Password" data-bs-toggle="tooltip" data-bs-pplacement="top" title="Harap isi konfirmasi password anda" required>
             </div>
 
+            <!-- CAPTCHA Section -->
             <div class="mb-3">
-                <label class="form-label">Silakan jawab pertanyaan berikut</label>
+                <label class="form-label">CAPTCHA - Silakan jawab pertanyaan berikut</label>
                 <div class="d-flex align-items-center gap-3">
-                    <div id="captchaQuestion" class="px-5 py-2 bg-light border rounded text-secondary fw-semibold">
-                        1 + 17
+                    <div id="captchaQuestion" class="px-4 py-3 bg-light border rounded text-center" style="min-width: 120px;">
+                        <span class="fw-bold fs-5 text-dark">{{ session('captcha_doktoral_num1', 0) }} + {{ session('captcha_doktoral_num2', 0) }}</span>
                     </div>
-                    <span class="fw-bold">=</span>
-                    <input type="text" id="captchaAnswer" name="captcha_answer" class="form-control" placeholder="Jawaban Anda" required>
-                    <button type="button" class="btn btn-primary" onclick="generateMathCaptcha()">
-                        <i class="fa fa-refresh"></i>
+                    <span class="fw-bold fs-4">=</span>
+                    <input type="number" id="captchaAnswer" name="captcha_answer" class="form-control" style="max-width: 150px;" placeholder="Jawaban" value="{{ old('captcha_answer') }}" required>
+                    <button type="button" id="refreshCaptcha" class="btn btn-primary" title="Refresh CAPTCHA">
+                        <i class="fa fa-refresh"></i> Refresh
                     </button>
                 </div>
-                <small id="captchaMessage" class="text-danger mt-2 d-block"></small>
+                @error('captcha_answer')
+                    <div class="text-danger mt-2 small">
+                        <i class="fa fa-exclamation-circle"></i> {{ $message }}
+                    </div>
+                @enderror
+                <small class="text-muted d-block mt-1">
+                    <i class="fa fa-info-circle"></i> Masukkan hasil penjumlahan di atas
+                </small>
             </div>
 
             <button type="submit" class="btn btn-success mt-3">Submit</button>
@@ -349,43 +357,55 @@
         }
 
         // ============================================
-        // CAPTCHA
+        // CAPTCHA - AJAX REFRESH
         // ============================================
-        let correctAnswer = 18;
+        const refreshCaptchaBtn = document.getElementById('refreshCaptcha');
+        if (refreshCaptchaBtn) {
+            refreshCaptchaBtn.addEventListener('click', function() {
+                // Disable button dan tambahkan loading state
+                this.disabled = true;
+                const icon = this.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-spin');
+                }
 
-        function generateMathCaptcha() {
-            const num1 = Math.floor(Math.random() * 20) + 1;
-            const num2 = Math.floor(Math.random() * 20) + 1;
-            correctAnswer = num1 + num2;
-            
-            const captchaQuestion = document.getElementById('captchaQuestion');
-            const captchaAnswer = document.getElementById('captchaAnswer');
-            const captchaMessage = document.getElementById('captchaMessage');
-            
-            if (captchaQuestion) captchaQuestion.textContent = num1 + ' + ' + num2;
-            if (captchaAnswer) captchaAnswer.value = '';
-            if (captchaMessage) captchaMessage.textContent = '';
+                // Fetch CAPTCHA baru via AJAX
+                fetch('{{ route("doktoral.captcha.refresh") }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update pertanyaan CAPTCHA
+                        const captchaQuestion = document.getElementById('captchaQuestion');
+                        if (captchaQuestion) {
+                            captchaQuestion.innerHTML = '<span class="fw-bold fs-5 text-dark">' + data.question + '</span>';
+                        }
+                        
+                        // Clear input jawaban
+                        const captchaAnswer = document.getElementById('captchaAnswer');
+                        if (captchaAnswer) {
+                            captchaAnswer.value = '';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error refreshing CAPTCHA:', error);
+                    alert('Gagal memuat CAPTCHA baru. Silakan coba lagi.');
+                })
+                .finally(() => {
+                    // Re-enable button dan hapus loading state
+                    this.disabled = false;
+                    if (icon) {
+                        icon.classList.remove('fa-spin');
+                    }
+                });
+            });
         }
-
-        function validateMathCaptcha() {
-            const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
-            const messageEl = document.getElementById('captchaMessage');
-            
-            if (userAnswer === correctAnswer) {
-                messageEl.textContent = 'Captcha benar!';
-                messageEl.classList.remove('text-danger');
-                messageEl.classList.add('text-success');
-                return true;
-            } else {
-                messageEl.textContent = 'Captcha salah! Silakan coba lagi.';
-                messageEl.classList.remove('text-success');
-                messageEl.classList.add('text-danger');
-                return false;
-            }
-        }
-
-        generateMathCaptcha();
-        window.generateMathCaptcha = generateMathCaptcha;
 
         // ============================================
         // NIK INPUT - COUNTER & MODAL
@@ -497,11 +517,6 @@
                 if (!validateAge()) {
                     e.preventDefault();
                     dateInput.focus();
-                    return false;
-                }
-                
-                if (!validateMathCaptcha()) {
-                    e.preventDefault();
                     return false;
                 }
             });
