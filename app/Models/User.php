@@ -45,4 +45,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relasi dengan tabel mahasiswa
+     * User bisa memiliki satu data mahasiswa
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function mahasiswa()
+    {
+        return $this->hasOne(Mahasiswa::class, 'user_id');
+    }
 }

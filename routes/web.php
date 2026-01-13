@@ -5,6 +5,20 @@ use App\Http\Controllers\UmurController;
 use App\Http\Controllers\SarjanaController;
 use App\Http\Controllers\MagisterController;
 use App\Http\Controllers\DoktoralController;
+use App\Http\Controllers\AuthController;
+
+// Authentication Routes
+Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'doRegister'])->name('register.submit');
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'doLogin'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Protected Routes (Memerlukan Login)
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
+    Route::post('/upload-dokumen', [AuthController::class, 'uploadDokumen'])->name('upload.dokumen');
+});
 
 // Homepage
 Route::get('/', function () {

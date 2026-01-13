@@ -23,6 +23,9 @@ class Mahasiswa extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        // Relasi
+        'user_id',          // relasi ke tabel users
+        
         // Data Pribadi
         'nama_lengkap',
         'tempat_lahir',
@@ -226,6 +229,28 @@ class Mahasiswa extends Model
         ]);
 
         return implode(', ', $parts);
+    }
+
+    /**
+     * Relasi dengan tabel users
+     * Setiap mahasiswa memiliki satu akun user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relasi dengan tabel dokumen_mahasiswa
+     * Setiap mahasiswa memiliki satu set dokumen
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function dokumen()
+    {
+        return $this->hasOne(DokumenMahasiswa::class, 'mahasiswa_id');
     }
 
     /**

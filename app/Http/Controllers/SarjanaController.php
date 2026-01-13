@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Mahasiswa;
+use App\Models\User;
 
 class SarjanaController extends Controller
 {
@@ -174,23 +176,43 @@ class SarjanaController extends Controller
            SIMPAN KE DATABASE
         =============================== */
         try {
+            // Gunakan database transaction untuk memastikan data konsisten
+            DB::beginTransaction();
+            
+            // 1. BUAT AKUN USER TERLEBIH DAHULU
+            $user = User::create([
+                'name' => $validated['nama_lengkap'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
+            
+            // 2. BUAT DATA MAHASISWA DAN HUBUNGKAN DENGAN USER
             // Set jenis pendaftaran
             $validated['jenis_pendaftaran'] = 'sarjana';
             
             // Set default status
             $validated['status_verifikasi'] = 'pending';
             
-            // Hash password
+            // Set user_id untuk relasi
+            $validated['user_id'] = $user->id;
+            
+            // Hash password untuk mahasiswa juga (untuk backup)
             $validated['password'] = Hash::make($validated['password']);
             
-            // Simpan ke database
+            // Simpan ke database mahasiswa
             $mahasiswa = Mahasiswa::create($validated);
             
+            // Commit transaction jika semua berhasil
+            DB::commit();
+            
             return redirect()->route('sarjana')
-                ->with('success', 'Pendaftaran berhasil! Data Anda telah tersimpan dengan No. Registrasi: ' . $mahasiswa->id);
+                ->with('success', 'Pendaftaran berhasil! Data Anda telah tersimpan dengan No. Registrasi: ' . $mahasiswa->id . '. Anda sudah bisa login dengan email dan password yang telah didaftarkan.');
         } catch (\Exception $e) {
+            // Rollback jika terjadi error
+            DB::rollBack();
+            
             return back()
-                ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'])
+                ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()])
                 ->withInput($request->except('password', 'password_confirmation'));
         }
     }

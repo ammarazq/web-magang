@@ -5,6 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Mahasiswa;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Mahasiswa>
@@ -28,10 +29,23 @@ class MahasiswaFactory extends Factory
         $jenisPendaftaran = $this->faker->randomElement(['sarjana', 'magister', 'doktoral']);
         $kewarganegaraan = $this->faker->randomElement(['WNI', 'WNA']);
         $isWNI = $kewarganegaraan === 'WNI';
+        
+        $namaLengkap = $this->faker->name();
+        $email = $this->faker->unique()->safeEmail();
+        
+        // Buat user terlebih dahulu
+        $user = User::create([
+            'name' => $namaLengkap,
+            'email' => $email,
+            'password' => Hash::make('password'),
+        ]);
 
         $data = [
+            // Relasi dengan users
+            'user_id' => $user->id,
+            
             // Data Pribadi
-            'nama_lengkap' => $this->faker->name(),
+            'nama_lengkap' => $namaLengkap,
             'tempat_lahir' => $this->faker->city(),
             'tanggal_lahir' => $this->faker->dateTimeBetween('-50 years', '-15 years'),
             'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
@@ -48,7 +62,7 @@ class MahasiswaFactory extends Factory
             // Data Kontak
             'alamat' => $jenisPendaftaran === 'sarjana' ? $this->faker->address() : null,
             'no_hp' => '08' . $this->faker->numerify('##########'),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $email,
             'password' => Hash::make('password'),
             
             // Data Akademik (khusus Sarjana)

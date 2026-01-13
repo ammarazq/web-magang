@@ -15,6 +15,13 @@ return new class extends Migration
             $table->id();
             
             // ============================================
+            // RELASI DENGAN USERS
+            // ============================================
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index('user_id');
+            
+            // ============================================
             // DATA PRIBADI
             // ============================================
             $table->string('nama_lengkap');
