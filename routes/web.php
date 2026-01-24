@@ -6,6 +6,8 @@ use App\Http\Controllers\SarjanaController;
 use App\Http\Controllers\MagisterController;
 use App\Http\Controllers\DoktoralController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\AdminController;
 
 // Authentication Routes
 Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -16,8 +18,38 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Protected Routes (Memerlukan Login)
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('dashboard');
-    Route::post('/upload-dokumen', [AuthController::class, 'uploadDokumen'])->name('upload.dokumen');
+    // Redirect ke dashboard sesuai role
+    Route::get('/dashboard', function() {
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('mahasiswa.dashboard');
+    })->name('dashboard');
+});
+
+// Mahasiswa Routes (Hanya untuk role mahasiswa)
+Route::middleware(['auth', 'mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+    Route::post('/upload', [MahasiswaController::class, 'uploadDokumen'])->name('upload');
+});
+
+// Admin Routes (Hanya untuk role admin)
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    
+    // Verifikasi Dokumen Routes
+    Route::get('/verifikasi', [AdminController::class, 'verifikasiDokumenList'])->name('verifikasi.list');
+    Route::get('/mahasiswa/{id}', [AdminController::class, 'detailMahasiswa'])->name('detail');
+    Route::post('/verifikasi/{id}', [AdminController::class, 'verifikasiDokumen'])->name('verifikasi');
+    Route::get('/download/{dokumenId}/{field}', [AdminController::class, 'downloadDokumen'])->name('download');
+    
+    // User Management Routes
+    Route::get('/users', [AdminController::class, 'userManagement'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
 });
 
 // Homepage

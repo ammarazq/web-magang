@@ -64,6 +64,7 @@ class MahasiswaSeeder extends Seeder
                 'name' => 'Test User Sarjana',
                 'email' => 'test.sarjana@example.com',
                 'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
             ]);
 
             Mahasiswa::create([
@@ -94,6 +95,7 @@ class MahasiswaSeeder extends Seeder
                 'name' => 'Test User Magister',
                 'email' => 'test.magister@example.com',
                 'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
             ]);
 
             Mahasiswa::create([
@@ -122,6 +124,7 @@ class MahasiswaSeeder extends Seeder
                 'name' => 'Test User WNA',
                 'email' => 'test.wna@example.com',
                 'password' => Hash::make('password'),
+                'role' => 'mahasiswa',
             ]);
 
             Mahasiswa::create([

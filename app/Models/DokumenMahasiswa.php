@@ -27,6 +27,12 @@ class DokumenMahasiswa extends Model
         // Status
         'status_dokumen',
         'catatan_verifikasi',
+        'verified_by',
+        'verified_at',
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 
     /**
@@ -35,6 +41,14 @@ class DokumenMahasiswa extends Model
     public function mahasiswa()
     {
         return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+    }
+
+    /**
+     * Relasi ke admin yang memverifikasi
+     */
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 
     /**

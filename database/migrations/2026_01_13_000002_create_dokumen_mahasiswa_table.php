@@ -33,6 +33,11 @@ return new class extends Migration
             $table->enum('status_dokumen', ['belum_lengkap', 'lengkap', 'diverifikasi', 'ditolak'])->default('belum_lengkap');
             $table->text('catatan_verifikasi')->nullable();
             
+            // Admin yang memverifikasi
+            $table->unsignedBigInteger('verified_by')->nullable();
+            $table->foreign('verified_by')->references('id')->on('users')->onDelete('set null');
+            $table->timestamp('verified_at')->nullable();
+            
             $table->timestamps();
             
             // Index
