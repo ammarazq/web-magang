@@ -41,6 +41,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/verifikasi', [AdminController::class, 'verifikasiDokumenList'])->name('verifikasi.list');
     Route::get('/mahasiswa/{id}', [AdminController::class, 'detailMahasiswa'])->name('detail');
     Route::post('/verifikasi/{id}', [AdminController::class, 'verifikasiDokumen'])->name('verifikasi');
+    Route::get('/view/{dokumenId}/{field}', [AdminController::class, 'viewDokumen'])->name('view');
     Route::get('/download/{dokumenId}/{field}', [AdminController::class, 'downloadDokumen'])->name('download');
     
     // User Management Routes

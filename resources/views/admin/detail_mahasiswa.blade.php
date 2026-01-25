@@ -145,7 +145,7 @@
                                     </div>
                                     <div>
                                         @if($dokumen->$field)
-                                            <a href="{{ asset('storage/' . $dokumen->$field) }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
+                                            <a href="{{ route('admin.view', ['dokumenId' => $dokumen->id, 'field' => $field]) }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
                                                 <i class="fas fa-eye"></i> Lihat
                                             </a>
                                             <a href="{{ route('admin.download', ['dokumenId' => $dokumen->id, 'field' => $field]) }}" class="btn btn-sm btn-outline-success">

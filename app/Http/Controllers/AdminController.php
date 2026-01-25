@@ -137,6 +137,31 @@ class AdminController extends Controller
     }
 
     /**
+     * View dokumen inline (untuk preview di browser)
+     */
+    public function viewDokumen($dokumenId, $field)
+    {
+        $dokumen = DokumenMahasiswa::findOrFail($dokumenId);
+        
+        if (!$dokumen->$field) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        $filePath = storage_path('app/public/' . $dokumen->$field);
+        
+        if (!file_exists($filePath)) {
+            abort(404, 'File tidak ditemukan di server.');
+        }
+
+        $mimeType = mime_content_type($filePath);
+        
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . basename($filePath) . '"'
+        ]);
+    }
+
+    /**
      * Download dokumen
      */
     public function downloadDokumen($dokumenId, $field)
