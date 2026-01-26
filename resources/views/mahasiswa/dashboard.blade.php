@@ -131,7 +131,7 @@
                             <div class="doc-item doc-uploaded">
                                 <i class="fas fa-file-check text-success"></i>
                                 <strong>{{ $name }}</strong>
-                                <a href="{{ asset('storage/' . $dokumen->$field) }}" target="_blank" class="btn btn-sm btn-outline-primary float-end">
+                                <a href="{{ asset('dokumen_mahasiswa/' . $dokumen->$field) }}" target="_blank" class="btn btn-sm btn-outline-primary float-end">
                                     <i class="fas fa-eye"></i> Lihat
                                 </a>
                             </div>
@@ -140,140 +140,70 @@
                 </div>
                 @endif
 
-                <!-- Form upload untuk dokumen yang belum diupload -->
-                @if(count($missingDocs) > 0 && $dokumen->status_dokumen !== 'diverifikasi')
+                <!-- Tombol Upload Dokumen -->
+                @if($dokumen->status_dokumen !== 'diverifikasi')
                 <div class="card">
-                    <div class="card-header bg-warning">
-                        <i class="fas fa-upload"></i> Upload Dokumen yang Belum Lengkap
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-upload"></i> Upload Dokumen Pendaftaran
                     </div>
-                    <div class="card-body">
-                        <form action="{{ route('mahasiswa.upload') }}" method="POST" enctype="multipart/form-data" id="uploadForm">
-                            @csrf
-                            @foreach($missingDocs as $field => $name)
-                                <div class="mb-3">
-                                    <label class="form-label"><strong>{{ $name }}</strong></label>
-                                    @if(in_array($field, ['foto_formal', 'ktp', 'formulir_keabsahan', 'formulir_pendaftaran']))
-                                        <input type="file" 
-                                               name="{{ $field }}" 
-                                               class="form-control @error($field) is-invalid @enderror"
-                                               accept=".jpg,.jpeg,.png"
-                                               data-max-size="2097152"
-                                               onchange="validateFile(this, 2097152, 'image')">
-                                        <small class="text-muted">
-                                            Format: JPG/PNG, Max: 2MB
-                                        </small>
-                                    @else
-                                        <input type="file" 
-                                               name="{{ $field }}" 
-                                               class="form-control @error($field) is-invalid @enderror"
-                                               accept=".pdf"
-                                               data-max-size="5242880"
-                                               onchange="validateFile(this, 5242880, 'pdf')">
-                                        <small class="text-muted">
-                                            Format: PDF, Max: 5MB
-                                        </small>
-                                    @endif
-                                    @error($field)
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                    <div class="invalid-feedback" id="error-{{ $field }}"></div>
-                                </div>
-                            @endforeach
+                    <div class="card-body text-center py-5">
+                        @if($mahasiswa->jenjang === 'S2')
+                            <div class="mb-4">
+                                <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
+                                <h4>Program Magister (S2)</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran S2 sesuai persyaratan</p>
+                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 14 dokumen wajib</p>
+                            </div>
+                            <a href="{{ route('magister.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen S2
+                            </a>
+                        @elseif($mahasiswa->jenjang === 'S3')
+                            <div class="mb-4">
+                                <i class="fas fa-user-graduate fa-4x text-primary mb-3"></i>
+                                <h4>Program Doktoral (S3)</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran S3 sesuai persyaratan</p>
+                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 13 dokumen wajib</p>
+                            </div>
+                            <a href="{{ route('doktoral.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen S3
+                            </a>
+                        @elseif(in_array($mahasiswa->jenjang, ['D3', 'D4', 'S1']))
+                            <div class="mb-4">
+                                <i class="fas fa-university fa-4x text-primary mb-3"></i>
+                                <h4>Program {{ $mahasiswa->jenjang }} @if($mahasiswa->jalur_program === 'RPL')(RPL)@endif</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran sesuai persyaratan</p>
+                                @if($mahasiswa->jalur_program === 'RPL')
+                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 6 dokumen wajib + 1 opsional</p>
+                                @else
+                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 5 dokumen wajib</p>
+                                @endif
+                            </div>
+                            <a href="{{ route('sarjana.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen {{ $mahasiswa->jenjang }}
+                            </a>
+                        @endif
 
-                            <button type="submit" class="btn btn-primary" id="submitBtn">
-                                <i class="fas fa-upload"></i> Upload Dokumen
-                            </button>
-                        </form>
+                        <div class="mt-4">
+                            <div class="alert alert-info text-start">
+                                <i class="fas fa-info-circle"></i> <strong>Informasi:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Pastikan semua dokumen dalam format yang benar (PDF/JPG)</li>
+                                    <li>Ukuran maksimal file: 2MB per dokumen</li>
+                                    <li>Upload dokumen dengan jelas dan terbaca</li>
+                                    <li>Dokumen yang sudah diupload bisa diupdate/diganti</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <script>
-                    function validateFile(input, maxSize, type) {
-                        const file = input.files[0];
-                        const errorDiv = document.getElementById('error-' + input.name);
-                        const submitBtn = document.getElementById('submitBtn');
-                        
-                        // Reset error
-                        input.classList.remove('is-invalid');
-                        errorDiv.textContent = '';
-                        errorDiv.style.display = 'none';
-                        
-                        if (file) {
-                            // Validasi ukuran file
-                            if (file.size > maxSize) {
-                                const maxSizeMB = maxSize / (1024 * 1024);
-                                input.classList.add('is-invalid');
-                                errorDiv.textContent = `Ukuran file terlalu besar! Maksimal ${maxSizeMB}MB`;
-                                errorDiv.style.display = 'block';
-                                input.value = '';
-                                return false;
-                            }
-                            
-                            // Validasi tipe file
-                            const fileName = file.name.toLowerCase();
-                            if (type === 'image') {
-                                if (!fileName.match(/\.(jpg|jpeg|png)$/)) {
-                                    input.classList.add('is-invalid');
-                                    errorDiv.textContent = 'Format file harus JPG, JPEG, atau PNG!';
-                                    errorDiv.style.display = 'block';
-                                    input.value = '';
-                                    return false;
-                                }
-                            } else if (type === 'pdf') {
-                                if (!fileName.endsWith('.pdf')) {
-                                    input.classList.add('is-invalid');
-                                    errorDiv.textContent = 'Format file harus PDF!';
-                                    errorDiv.style.display = 'block';
-                                    input.value = '';
-                                    return false;
-                                }
-                            }
-                            
-                            // Tampilkan info ukuran file
-                            const fileSizeKB = (file.size / 1024).toFixed(2);
-                            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                            const sizeInfo = fileSizeKB < 1024 ? fileSizeKB + ' KB' : fileSizeMB + ' MB';
-                            input.nextElementSibling.innerHTML = `<span class="text-success"><i class="fas fa-check"></i> File dipilih: ${file.name} (${sizeInfo})</span>`;
-                        }
-                        
-                        return true;
-                    }
-                    
-                    // Validasi sebelum submit
-                    document.getElementById('uploadForm').addEventListener('submit', function(e) {
-                        const fileInputs = this.querySelectorAll('input[type="file"]');
-                        let hasFile = false;
-                        let hasError = false;
-                        
-                        fileInputs.forEach(function(input) {
-                            if (input.files.length > 0) {
-                                hasFile = true;
-                            }
-                            if (input.classList.contains('is-invalid')) {
-                                hasError = true;
-                            }
-                        });
-                        
-                        if (!hasFile) {
-                            e.preventDefault();
-                            alert('Pilih minimal satu dokumen untuk diupload!');
-                            return false;
-                        }
-                        
-                        if (hasError) {
-                            e.preventDefault();
-                            alert('Ada kesalahan pada file yang dipilih. Periksa kembali file Anda!');
-                            return false;
-                        }
-                    });
-                </script>
-                @elseif($dokumen->status_dokumen === 'diverifikasi')
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <strong>Selamat!</strong> Dokumen Anda sudah diverifikasi dan disetujui oleh admin.
-                </div>
-                @elseif($dokumen->status_dokumen === 'lengkap')
-                <div class="alert alert-info">
-                    <i class="fas fa-hourglass-half"></i> Dokumen Anda sudah lengkap dan sedang menunggu verifikasi dari admin.
+                @else
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h4 class="text-success">Dokumen Sudah Diverifikasi</h4>
+                        <p class="text-muted">Dokumen Anda sudah diverifikasi dan disetujui oleh admin.</p>
+                        <p>Silakan menunggu informasi selanjutnya melalui email.</p>
+                    </div>
                 </div>
                 @endif
             </div>

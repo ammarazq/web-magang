@@ -13,17 +13,30 @@ class DokumenMahasiswa extends Model
 
     protected $fillable = [
         'mahasiswa_id',
-        // Dokumen Non RPL
-        'ijazah_slta',
+        // Dokumen Umum
+        'formulir_pendaftaran',
+        'formulir_keabsahan',
         'foto_formal',
         'ktp',
-        'formulir_keabsahan',
-        'formulir_pendaftaran',
-        // Dokumen RPL
-        'ijazah_pendidikan_terakhir',
-        'transkrip_nilai',
+        'ijazah_slta',
+        // Dokumen S1 RPL
         'ijazah_slta_asli',
+        'transkrip_nilai',
+        'ijazah_d3_d4_s1',
+        // Dokumen S2
+        'sertifikat_akreditasi_prodi',
+        'transkrip_d3_d4_s1',
+        'sertifikat_toefl',
+        'rancangan_penelitian',
+        'sk_mampu_komputer',
+        'bukti_tes_tpa',
+        'seleksi_tes_substansi',
+        'formulir_isian_foto',
         'riwayat_hidup',
+        // Dokumen S3
+        'ijazah_s2',
+        'transkrip_s2',
+        'sertifikat_akreditasi_s2',
         // Status
         'status_dokumen',
         'catatan_verifikasi',
@@ -52,7 +65,7 @@ class DokumenMahasiswa extends Model
     }
 
     /**
-     * Check apakah dokumen sudah lengkap berdasarkan jalur program
+     * Check apakah dokumen sudah lengkap berdasarkan jalur program dan jenjang
      */
     public function isDokumenLengkap()
     {
@@ -62,24 +75,74 @@ class DokumenMahasiswa extends Model
             return false;
         }
 
-        if ($mahasiswa->jalur_program === 'Non RPL') {
-            // Cek dokumen Non RPL
-            return !empty($this->ijazah_slta) &&
+        $jenjang = $mahasiswa->jenjang;
+        $jalurProgram = $mahasiswa->jalur_program;
+        
+        // D3/D4 REGULER (Non RPL atau RPL - keduanya sama saja untuk D3/D4)
+        if (in_array($jenjang, ['D3', 'D4'])) {
+            return !empty($this->formulir_pendaftaran) &&
+                   !empty($this->formulir_keabsahan) &&
                    !empty($this->foto_formal) &&
                    !empty($this->ktp) &&
-                   !empty($this->formulir_keabsahan) &&
-                   !empty($this->formulir_pendaftaran);
-        } else { // RPL
-            // Cek dokumen RPL
-            return !empty($this->ijazah_pendidikan_terakhir) &&
-                   !empty($this->transkrip_nilai) &&
-                   !empty($this->ijazah_slta_asli) &&
-                   !empty($this->foto_formal) &&
-                   !empty($this->ktp) &&
-                   !empty($this->formulir_keabsahan) &&
-                   !empty($this->formulir_pendaftaran) &&
-                   !empty($this->riwayat_hidup);
+                   !empty($this->ijazah_slta);
         }
+        
+        // S1 REGULER (Non RPL)
+        if ($jenjang === 'S1' && $jalurProgram === 'Non RPL') {
+            return !empty($this->formulir_pendaftaran) &&
+                   !empty($this->formulir_keabsahan) &&
+                   !empty($this->foto_formal) &&
+                   !empty($this->ktp) &&
+                   !empty($this->ijazah_slta);
+        }
+        
+        // S1 RPL
+        if ($jenjang === 'S1' && $jalurProgram === 'RPL') {
+            return !empty($this->formulir_pendaftaran) &&
+                   !empty($this->formulir_keabsahan) &&
+                   !empty($this->foto_formal) &&
+                   !empty($this->ktp) &&
+                   !empty($this->ijazah_slta_asli) &&
+                   !empty($this->transkrip_nilai);
+                   // ijazah_d3_d4_s1 optional (jika sudah lulus)
+        }
+        
+        // S2
+        if ($jenjang === 'S2') {
+            return !empty($this->formulir_pendaftaran) &&
+                   !empty($this->formulir_keabsahan) &&
+                   !empty($this->foto_formal) &&
+                   !empty($this->ktp) &&
+                   !empty($this->ijazah_slta) &&
+                   !empty($this->sertifikat_akreditasi_prodi) &&
+                   !empty($this->transkrip_d3_d4_s1) &&
+                   !empty($this->riwayat_hidup) &&
+                   !empty($this->sertifikat_toefl) &&
+                   !empty($this->rancangan_penelitian) &&
+                   !empty($this->sk_mampu_komputer) &&
+                   !empty($this->bukti_tes_tpa) &&
+                   !empty($this->seleksi_tes_substansi) &&
+                   !empty($this->formulir_isian_foto);
+        }
+        
+        // S3
+        if ($jenjang === 'S3') {
+            return !empty($this->formulir_pendaftaran) &&
+                   !empty($this->formulir_keabsahan) &&
+                   !empty($this->foto_formal) &&
+                   !empty($this->ktp) &&
+                   !empty($this->ijazah_slta) &&
+                   !empty($this->sertifikat_akreditasi_prodi) &&
+                   !empty($this->transkrip_d3_d4_s1) &&
+                   !empty($this->riwayat_hidup) &&
+                   !empty($this->sertifikat_toefl) &&
+                   !empty($this->rancangan_penelitian) &&
+                   !empty($this->sk_mampu_komputer) &&
+                   !empty($this->bukti_tes_tpa) &&
+                   !empty($this->seleksi_tes_substansi);
+        }
+        
+        return false;
     }
 
     /**
@@ -93,31 +156,77 @@ class DokumenMahasiswa extends Model
             return 0;
         }
 
-        if ($mahasiswa->jalur_program === 'Non RPL') {
-            $required = 5; // jumlah dokumen wajib
-            $uploaded = 0;
-            
+        $jenjang = $mahasiswa->jenjang;
+        $jalurProgram = $mahasiswa->jalur_program;
+        $required = 0;
+        $uploaded = 0;
+        
+        // D3/D4 (Non RPL atau RPL - keduanya sama saja)
+        if (in_array($jenjang, ['D3', 'D4'])) {
+            $required = 5;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
             if ($this->ijazah_slta) $uploaded++;
-            if ($this->foto_formal) $uploaded++;
-            if ($this->ktp) $uploaded++;
-            if ($this->formulir_keabsahan) $uploaded++;
-            if ($this->formulir_pendaftaran) $uploaded++;
-            
-            return round(($uploaded / $required) * 100);
-        } else { // RPL
-            $required = 8; // jumlah dokumen wajib
-            $uploaded = 0;
-            
-            if ($this->ijazah_pendidikan_terakhir) $uploaded++;
-            if ($this->transkrip_nilai) $uploaded++;
-            if ($this->ijazah_slta_asli) $uploaded++;
-            if ($this->foto_formal) $uploaded++;
-            if ($this->ktp) $uploaded++;
-            if ($this->formulir_keabsahan) $uploaded++;
-            if ($this->formulir_pendaftaran) $uploaded++;
-            if ($this->riwayat_hidup) $uploaded++;
-            
-            return round(($uploaded / $required) * 100);
         }
+        // S1 Non RPL
+        elseif ($jenjang === 'S1' && $jalurProgram === 'Non RPL') {
+            $required = 5;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+        }
+        // S1 RPL
+        elseif ($jenjang === 'S1' && $jalurProgram === 'RPL') {
+            $required = 6; // 6 wajib, ijazah_d3_d4_s1 opsional
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta_asli) $uploaded++;
+            if ($this->transkrip_nilai) $uploaded++;
+            // ijazah_d3_d4_s1 dihitung bonus jika ada
+            if ($this->ijazah_d3_d4_s1) $uploaded++;
+        }
+        // S2
+        elseif ($jenjang === 'S2') {
+            $required = 14;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+            if ($this->sertifikat_akreditasi_prodi) $uploaded++;
+            if ($this->transkrip_d3_d4_s1) $uploaded++;
+            if ($this->riwayat_hidup) $uploaded++;
+            if ($this->sertifikat_toefl) $uploaded++;
+            if ($this->rancangan_penelitian) $uploaded++;
+            if ($this->sk_mampu_komputer) $uploaded++;
+            if ($this->bukti_tes_tpa) $uploaded++;
+            if ($this->seleksi_tes_substansi) $uploaded++;
+            if ($this->formulir_isian_foto) $uploaded++;
+        }
+        // S3
+        elseif ($jenjang === 'S3') {
+            $required = 13;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+            if ($this->sertifikat_akreditasi_prodi) $uploaded++;
+            if ($this->transkrip_d3_d4_s1) $uploaded++;
+            if ($this->riwayat_hidup) $uploaded++;
+            if ($this->sertifikat_toefl) $uploaded++;
+            if ($this->rancangan_penelitian) $uploaded++;
+            if ($this->sk_mampu_komputer) $uploaded++;
+            if ($this->bukti_tes_tpa) $uploaded++;
+            if ($this->seleksi_tes_substansi) $uploaded++;
+        }
+        
+        return $required > 0 ? round(($uploaded / $required) * 100) : 0;
     }
 }

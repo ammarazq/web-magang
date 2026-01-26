@@ -308,18 +308,33 @@
                 <label for="email" class="form-label">Email</label>
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon3">@</span>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan Email" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan E-mail Anda" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="contoh@email.com" required>
                 </div>
+                <small class="text-muted d-block mt-1">
+                    <i class="fa fa-info-circle"></i> Format email harus valid (contoh: nama@domain.com)
+                </small>
+                <div id="emailValidation" class="mt-1"></div>
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan Password Anda" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" required>
+                <small class="text-muted d-block mt-1">
+                    <strong><i class="fa fa-info-circle"></i> Petunjuk Password:</strong><br>
+                    <span id="rule-lowercase" class="text-danger">✗ Harus mengandung minimal satu huruf kecil</span><br>
+                    <span id="rule-uppercase" class="text-danger">✗ Harus mengandung minimal satu huruf besar</span><br>
+                    <span id="rule-length" class="text-danger">✗ Minimal 8 karakter</span><br>
+                    <span id="rule-number" class="text-danger">✗ Harus mengandung minimal satu angka</span><br>
+                    <span id="rule-nodoublenum" class="text-danger">✗ Tidak boleh meninputkan angka berurutan (misal: 123, 234)</span><br>
+                    <span id="rule-nosequential" class="text-danger">✗ Tidak boleh mengandung karakter berurut (misal: abc, xyz)</span><br>
+                    <span id="rule-special" class="text-danger">✗ Harus mengandung minimal satu karakter unik (!@#$%^&*)</span>
+                </small>
             </div>
 
             <div class="mb-3">
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Masukkan Konfirmasi Password" data-bs-toggle="tooltip" data-bs-pplacement="top" title="Harap isi konfirmasi password anda" required>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Masukkan Konfirmasi Password" required>
+                <div id="passwordMatch" class="mt-1"></div>
             </div>
 
 
@@ -805,6 +820,9 @@
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
                 
+                // Update pilihan jenjang berdasarkan jalur program
+                updateJenjangOptions(jalur);
+                
                 // Jika RPL dipilih, tampilkan modal persetujuan RPL
                 if (jalur === 'RPL' && rplModalInstance) {
                     rplModalInstance.show();
@@ -815,6 +833,50 @@
                 }
             });
         });
+
+        // ============================================
+        // UPDATE JENJANG OPTIONS BASED ON JALUR PROGRAM
+        // ============================================
+        function updateJenjangOptions(jalur) {
+            const jenjangSelect = document.getElementById('jenjang');
+            if (!jenjangSelect) return;
+            
+            // Simpan nilai yang sudah dipilih (jika ada)
+            const currentValue = jenjangSelect.value;
+            
+            // Hapus semua option kecuali yang pertama (Pilih...)
+            jenjangSelect.innerHTML = '<option selected value="">Pilih...</option>';
+            
+            if (jalur === 'RPL') {
+                // RPL hanya bisa S1
+                const option = document.createElement('option');
+                option.value = 'S1';
+                option.textContent = 'S1';
+                jenjangSelect.appendChild(option);
+                
+                // Auto select S1 untuk RPL
+                jenjangSelect.value = 'S1';
+                
+                // Trigger change event untuk update program studi
+                jenjangSelect.dispatchEvent(new Event('change'));
+            } else if (jalur === 'Non RPL') {
+                // Non RPL bisa D3, D4, S1
+                const jenjangOptions = ['D3', 'D4', 'S1'];
+                jenjangOptions.forEach(jenjang => {
+                    const option = document.createElement('option');
+                    option.value = jenjang;
+                    option.textContent = jenjang;
+                    jenjangSelect.appendChild(option);
+                });
+                
+                // Restore nilai sebelumnya jika masih valid
+                if (jenjangOptions.includes(currentValue)) {
+                    jenjangSelect.value = currentValue;
+                } else {
+                    jenjangSelect.value = '';
+                }
+            }
+        }
 
         // ============================================
         // MODAL RPL PERSETUJUAN
@@ -848,6 +910,156 @@
             });
         }
 
+        // ============================================
+        // VALIDASI EMAIL REAL-TIME
+        // ============================================
+        const emailInput = document.getElementById('email');
+        const emailValidation = document.getElementById('emailValidation');
+
+        if (emailInput && emailValidation) {
+            emailInput.addEventListener('input', function() {
+                const email = this.value.trim();
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (email === '') {
+                    emailValidation.innerHTML = '';
+                    emailInput.classList.remove('is-valid', 'is-invalid');
+                } else if (emailPattern.test(email)) {
+                    emailValidation.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Format email valid</small>';
+                    emailInput.classList.remove('is-invalid');
+                    emailInput.classList.add('is-valid');
+                } else {
+                    emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Format email tidak valid</small>';
+                    emailInput.classList.remove('is-valid');
+                    emailInput.classList.add('is-invalid');
+                }
+            });
+        }
+
+        // ============================================
+        // VALIDASI PASSWORD KOMPLEKS REAL-TIME
+        // ============================================
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirmation');
+        const passwordMatchDiv = document.getElementById('passwordMatch');
+
+        // Fungsi untuk mengecek urutan angka
+        function hasSequentialNumbers(str) {
+            for (let i = 0; i < str.length - 2; i++) {
+                const char1 = str.charCodeAt(i);
+                const char2 = str.charCodeAt(i + 1);
+                const char3 = str.charCodeAt(i + 2);
+                
+                // Cek urutan naik (123, 234, dll)
+                if (char2 === char1 + 1 && char3 === char2 + 1) {
+                    return true;
+                }
+                // Cek urutan turun (321, 210, dll)
+                if (char2 === char1 - 1 && char3 === char2 - 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Fungsi untuk mengecek urutan huruf
+        function hasSequentialLetters(str) {
+            const lower = str.toLowerCase();
+            for (let i = 0; i < lower.length - 2; i++) {
+                const char1 = lower.charCodeAt(i);
+                const char2 = lower.charCodeAt(i + 1);
+                const char3 = lower.charCodeAt(i + 2);
+                
+                // Cek urutan naik (abc, bcd, xyz, dll)
+                if (char2 === char1 + 1 && char3 === char2 + 1) {
+                    return true;
+                }
+                // Cek urutan turun (cba, zyx, dll)
+                if (char2 === char1 - 1 && char3 === char2 - 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Validasi password real-time
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                
+                // Rule: Minimal 1 huruf kecil
+                const hasLowercase = /[a-z]/.test(password);
+                updateRule('rule-lowercase', hasLowercase, 'Harus mengandung minimal satu huruf kecil');
+                
+                // Rule: Minimal 1 huruf besar
+                const hasUppercase = /[A-Z]/.test(password);
+                updateRule('rule-uppercase', hasUppercase, 'Harus mengandung minimal satu huruf besar');
+                
+                // Rule: Minimal 8 karakter
+                const hasMinLength = password.length >= 8;
+                updateRule('rule-length', hasMinLength, 'Minimal 8 karakter');
+                
+                // Rule: Minimal 1 angka
+                const hasNumber = /[0-9]/.test(password);
+                updateRule('rule-number', hasNumber, 'Harus mengandung minimal satu angka');
+                
+                // Rule: Tidak ada angka berurutan
+                const noSequentialNum = !hasSequentialNumbers(password);
+                updateRule('rule-nodoublenum', noSequentialNum, 'Tidak boleh meninputkan angka berurutan (misal: 123, 234)');
+                
+                // Rule: Tidak ada huruf berurutan
+                const noSequentialLetter = !hasSequentialLetters(password);
+                updateRule('rule-nosequential', noSequentialLetter, 'Tidak boleh mengandung karakter berurut (misal: abc, xyz)');
+                
+                // Rule: Minimal 1 karakter spesial
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                updateRule('rule-special', hasSpecial, 'Harus mengandung minimal satu karakter unik (!@#$%^&*)');
+                
+                // Cek match dengan confirm password
+                checkPasswordMatch();
+            });
+        }
+
+        // Validasi confirm password
+        if (passwordConfirmInput) {
+            passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+        }
+
+        // Fungsi untuk update rule visual
+        function updateRule(elementId, isValid, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (isValid) {
+                    element.className = 'text-success';
+                    element.innerHTML = '✓ ' + message;
+                } else {
+                    element.className = 'text-danger';
+                    element.innerHTML = '✗ ' + message;
+                }
+            }
+        }
+
+        // Fungsi untuk cek kecocokan password
+        function checkPasswordMatch() {
+            if (!passwordInput || !passwordConfirmInput || !passwordMatchDiv) return;
+            
+            const password = passwordInput.value;
+            const confirmPassword = passwordConfirmInput.value;
+            
+            if (confirmPassword === '') {
+                passwordMatchDiv.innerHTML = '';
+                passwordConfirmInput.classList.remove('is-valid', 'is-invalid');
+            } else if (password === confirmPassword) {
+                passwordMatchDiv.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Password cocok</small>';
+                passwordConfirmInput.classList.remove('is-invalid');
+                passwordConfirmInput.classList.add('is-valid');
+            } else {
+                passwordMatchDiv.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Password tidak cocok</small>';
+                passwordConfirmInput.classList.remove('is-valid');
+                passwordConfirmInput.classList.add('is-invalid');
+            }
+        }
+
         // Tombol Kembali - reset pilihan jalur program dan tutup modal
         if (btnKembali) {
             btnKembali.addEventListener('click', function() {
@@ -860,6 +1072,12 @@
                     btn.classList.remove('btn-primary');
                     btn.classList.add('btn-outline-primary');
                 });
+                
+                // Reset pilihan jenjang
+                const jenjangSelect = document.getElementById('jenjang');
+                if (jenjangSelect) {
+                    jenjangSelect.innerHTML = '<option selected value="">Pilih...</option><option value="D3">D3</option><option value="D4">D4</option><option value="S1">S1</option>';
+                }
                 
                 // Reset checkbox
                 if (rplCheckbox) {
@@ -920,6 +1138,12 @@
                     btn.classList.remove('btn-primary');
                     btn.classList.add('btn-outline-primary');
                 });
+                
+                // Reset pilihan jenjang
+                const jenjangSelect = document.getElementById('jenjang');
+                if (jenjangSelect) {
+                    jenjangSelect.innerHTML = '<option selected value="">Pilih...</option><option value="D3">D3</option><option value="D4">D4</option><option value="S1">S1</option>';
+                }
                 
                 // Reset checkbox
                 if (nonRplCheckbox) {

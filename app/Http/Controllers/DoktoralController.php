@@ -64,7 +64,47 @@ class DoktoralController extends Controller
             'kewarganegaraan' => 'required|in:WNI,WNA',
             'no_hp' => 'required|numeric|digits_between:10,15',
             'email' => 'required|email|unique:mahasiswa,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*()_+\-=\[\]{};:\'",.<>\/?\\|`~]/',
+                function ($attribute, $value, $fail) {
+                    // Cek urutan angka
+                    for ($i = 0; $i < strlen($value) - 2; $i++) {
+                        if (is_numeric($value[$i]) && is_numeric($value[$i+1]) && is_numeric($value[$i+2])) {
+                            $num1 = (int)$value[$i];
+                            $num2 = (int)$value[$i+1];
+                            $num3 = (int)$value[$i+2];
+                            
+                            if (($num2 === $num1 + 1 && $num3 === $num2 + 1) || 
+                                ($num2 === $num1 - 1 && $num3 === $num2 - 1)) {
+                                $fail('Password tidak boleh mengandung angka berurutan (contoh: 123, 234, 321).');
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Cek urutan huruf
+                    $lower = strtolower($value);
+                    for ($i = 0; $i < strlen($lower) - 2; $i++) {
+                        if (ctype_alpha($lower[$i]) && ctype_alpha($lower[$i+1]) && ctype_alpha($lower[$i+2])) {
+                            $char1 = ord($lower[$i]);
+                            $char2 = ord($lower[$i+1]);
+                            $char3 = ord($lower[$i+2]);
+                            
+                            if (($char2 === $char1 + 1 && $char3 === $char2 + 1) || 
+                                ($char2 === $char1 - 1 && $char3 === $char2 - 1)) {
+                                $fail('Password tidak boleh mengandung huruf berurutan (contoh: abc, xyz, cba).');
+                                return;
+                            }
+                        }
+                    }
+                }
+            ],
             'captcha_answer' => 'required|numeric'
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi',
@@ -85,8 +125,9 @@ class DoktoralController extends Controller
             'email.email' => 'Format email tidak valid',
             'email.unique' => 'Email sudah terdaftar',
             'password.required' => 'Password wajib diisi',
-            'password.min' => 'Password minimal 6 karakter',
+            'password.min' => 'Password minimal 8 karakter',
             'password.confirmed' => 'Konfirmasi password tidak cocok',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial',
             'captcha_answer.required' => 'Jawaban CAPTCHA wajib diisi',
             'captcha_answer.numeric' => 'Jawaban CAPTCHA harus berupa angka'
         ]);
@@ -162,6 +203,111 @@ class DoktoralController extends Controller
             return redirect()->back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()])
                 ->withInput($request->except('password', 'password_confirmation'));
+        }
+    }
+
+    /**
+     * Tampilkan form upload dokumen doktoral
+     */
+    public function uploadForm()
+    {
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+        
+        if (!$mahasiswa) {
+            return redirect()->route('login')->with('error', 'Data mahasiswa tidak ditemukan');
+        }
+
+        // Ambil atau buat data dokumen
+        $dokumen = $mahasiswa->dokumen ?? new \App\Models\DokumenMahasiswa(['mahasiswa_id' => $mahasiswa->id]);
+        
+        return view('pages.doktoral-upload', compact('mahasiswa', 'dokumen'));
+    }
+
+    /**
+     * Proses upload dokumen doktoral
+     */
+    public function uploadDokumen(Request $request)
+    {
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+        
+        if (!$mahasiswa) {
+            return redirect()->route('login')->with('error', 'Data mahasiswa tidak ditemukan');
+        }
+
+        // Validasi file upload
+        $validator = Validator::make($request->all(), [
+            'formulir_pendaftaran' => 'nullable|file|mimes:jpg,jpeg,pdf|max:5120',
+            'formulir_keabsahan' => 'nullable|file|mimes:jpg,jpeg,pdf|max:5120',
+            'foto_formal' => 'nullable|file|mimes:jpg,jpeg|max:2048',
+            'ktp' => 'nullable|file|mimes:jpg,jpeg|max:2048',
+            'ijazah_slta' => 'nullable|file|mimes:pdf|max:5120',
+            'sertifikat_akreditasi_prodi' => 'nullable|file|mimes:pdf|max:5120',
+            'transkrip_d3_d4_s1' => 'nullable|file|mimes:pdf|max:5120',
+            'sertifikat_toefl' => 'nullable|file|mimes:pdf|max:5120',
+            'rancangan_penelitian' => 'nullable|file|mimes:pdf|max:5120',
+            'sk_mampu_komputer' => 'nullable|file|mimes:pdf|max:5120',
+            'bukti_tes_tpa' => 'nullable|file|mimes:pdf|max:5120',
+            'seleksi_tes_substansi' => 'nullable|file|mimes:pdf|max:5120',
+            'formulir_isian_foto' => 'nullable|file|mimes:jpg,jpeg,pdf|max:2048',
+            'riwayat_hidup' => 'nullable|file|mimes:pdf|max:5120',
+            'ijazah_s2' => 'nullable|file|mimes:pdf|max:5120',
+            'transkrip_s2' => 'nullable|file|mimes:pdf|max:5120',
+            'sertifikat_akreditasi_s2' => 'nullable|file|mimes:pdf|max:5120',
+        ], [
+            '*.mimes' => 'File :attribute harus berformat :values',
+            '*.max' => 'Ukuran file :attribute terlalu besar. Maksimal :max KB (5MB untuk PDF, 2MB untuk gambar)',
+            '*.file' => 'File :attribute tidak valid',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            // Ambil atau buat data dokumen
+            $dokumen = $mahasiswa->dokumen;
+            if (!$dokumen) {
+                $dokumen = new \App\Models\DokumenMahasiswa();
+                $dokumen->mahasiswa_id = $mahasiswa->id;
+            }
+            
+            // Upload file yang ada
+            $uploadedFiles = [];
+            $fields = [
+                'formulir_pendaftaran', 'formulir_keabsahan', 'foto_formal', 'ktp', 'ijazah_slta',
+                'sertifikat_akreditasi_prodi', 'transkrip_d3_d4_s1', 'sertifikat_toefl',
+                'rancangan_penelitian', 'sk_mampu_komputer', 'bukti_tes_tpa',
+                'seleksi_tes_substansi', 'formulir_isian_foto', 'riwayat_hidup',
+                'ijazah_s2', 'transkrip_s2', 'sertifikat_akreditasi_s2'
+            ];
+
+            foreach ($fields as $field) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $fileName = $mahasiswa->id . '_' . $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    // Simpan langsung ke public/dokumen_mahasiswa
+                    $file->move(public_path('dokumen_mahasiswa'), $fileName);
+                    $dokumen->$field = $fileName;
+                    $uploadedFiles[] = $field;
+                }
+            }
+
+            // Update status dokumen
+            if (count($uploadedFiles) > 0) {
+                // Cek apakah dokumen sudah lengkap
+                if ($dokumen->isDokumenLengkap()) {
+                    $dokumen->status_dokumen = 'lengkap';
+                }
+                $dokumen->save();
+                return redirect()->back()->with('success', 'Berhasil mengupload ' . count($uploadedFiles) . ' dokumen');
+            } else {
+                return redirect()->back()->with('info', 'Tidak ada dokumen yang diupload');
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }

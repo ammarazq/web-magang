@@ -183,18 +183,33 @@
                 <label for="email" class="form-label">Email</label>
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon3">@</span>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan Email" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan E-mail Anda" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="contoh@email.com" required>
                 </div>
+                <small class="text-muted d-block mt-1">
+                    <i class="fa fa-info-circle"></i> Format email harus valid (contoh: nama@domain.com)
+                </small>
+                <div id="emailValidation" class="mt-1"></div>
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" data-bs-toggle="tooltip" data-bs-placement="top" title="Harap isi dengan Password Anda" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" required>
+                <small class="text-muted d-block mt-1">
+                    <strong><i class="fa fa-info-circle"></i> Petunjuk Password:</strong><br>
+                    <span id="rule-lowercase" class="text-danger">✗ Harus mengandung minimal satu huruf kecil</span><br>
+                    <span id="rule-uppercase" class="text-danger">✗ Harus mengandung minimal satu huruf besar</span><br>
+                    <span id="rule-length" class="text-danger">✗ Minimal 8 karakter</span><br>
+                    <span id="rule-number" class="text-danger">✗ Harus mengandung minimal satu angka</span><br>
+                    <span id="rule-nodoublenum" class="text-danger">✗ Tidak boleh meninputkan angka berurutan (misal: 123, 234)</span><br>
+                    <span id="rule-nosequential" class="text-danger">✗ Tidak boleh mengandung karakter berurut (misal: abc, xyz)</span><br>
+                    <span id="rule-special" class="text-danger">✗ Harus mengandung minimal satu karakter unik (!@#$%^&*)</span>
+                </small>
             </div>
 
             <div class="mb-3">
                 <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Masukkan Konfirmasi Password" data-bs-toggle="tooltip" data-bs-pplacement="top" title="Harap isi konfirmasi password anda" required>
+                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Masukkan Konfirmasi Password" required>
+                <div id="passwordMatch" class="mt-1"></div>
             </div>
 
             <!-- CAPTCHA Section -->
@@ -519,19 +534,142 @@
             });
         }
 
-        // Password match validation
-        const passwordConfirm = document.getElementById('password_confirmation');
-        if (passwordConfirm) {
-            passwordConfirm.addEventListener('input', function() {
-                const password = document.getElementById('password').value;
-                const confirmation = this.value;
+        // ============================================
+        // VALIDASI EMAIL REAL-TIME
+        // ============================================
+        const emailInput = document.getElementById('email');
+        const emailValidation = document.getElementById('emailValidation');
+
+        if (emailInput && emailValidation) {
+            emailInput.addEventListener('input', function() {
+                const email = this.value.trim();
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 
-                if (password !== confirmation) {
-                    this.setCustomValidity('Password tidak cocok');
+                if (email === '') {
+                    emailValidation.innerHTML = '';
+                    emailInput.classList.remove('is-valid', 'is-invalid');
+                } else if (emailPattern.test(email)) {
+                    emailValidation.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Format email valid</small>';
+                    emailInput.classList.remove('is-invalid');
+                    emailInput.classList.add('is-valid');
                 } else {
-                    this.setCustomValidity('');
+                    emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Format email tidak valid</small>';
+                    emailInput.classList.remove('is-valid');
+                    emailInput.classList.add('is-invalid');
                 }
             });
+        }
+
+        // ============================================
+        // VALIDASI PASSWORD KOMPLEKS REAL-TIME
+        // ============================================
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirmation');
+        const passwordMatchDiv = document.getElementById('passwordMatch');
+
+        // Fungsi untuk mengecek urutan angka
+        function hasSequentialNumbers(str) {
+            for (let i = 0; i < str.length - 2; i++) {
+                const char1 = str.charCodeAt(i);
+                const char2 = str.charCodeAt(i + 1);
+                const char3 = str.charCodeAt(i + 2);
+                
+                if (char2 === char1 + 1 && char3 === char2 + 1) {
+                    return true;
+                }
+                if (char2 === char1 - 1 && char3 === char2 - 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Fungsi untuk mengecek urutan huruf
+        function hasSequentialLetters(str) {
+            const lower = str.toLowerCase();
+            for (let i = 0; i < lower.length - 2; i++) {
+                const char1 = lower.charCodeAt(i);
+                const char2 = lower.charCodeAt(i + 1);
+                const char3 = lower.charCodeAt(i + 2);
+                
+                if (char2 === char1 + 1 && char3 === char2 + 1) {
+                    return true;
+                }
+                if (char2 === char1 - 1 && char3 === char2 - 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Validasi password real-time
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                
+                const hasLowercase = /[a-z]/.test(password);
+                updateRule('rule-lowercase', hasLowercase, 'Harus mengandung minimal satu huruf kecil');
+                
+                const hasUppercase = /[A-Z]/.test(password);
+                updateRule('rule-uppercase', hasUppercase, 'Harus mengandung minimal satu huruf besar');
+                
+                const hasMinLength = password.length >= 8;
+                updateRule('rule-length', hasMinLength, 'Minimal 8 karakter');
+                
+                const hasNumber = /[0-9]/.test(password);
+                updateRule('rule-number', hasNumber, 'Harus mengandung minimal satu angka');
+                
+                const noSequentialNum = !hasSequentialNumbers(password);
+                updateRule('rule-nodoublenum', noSequentialNum, 'Tidak boleh meninputkan angka berurutan (misal: 123, 234)');
+                
+                const noSequentialLetter = !hasSequentialLetters(password);
+                updateRule('rule-nosequential', noSequentialLetter, 'Tidak boleh mengandung karakter berurut (misal: abc, xyz)');
+                
+                const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+                updateRule('rule-special', hasSpecial, 'Harus mengandung minimal satu karakter unik (!@#$%^&*)');
+                
+                checkPasswordMatch();
+            });
+        }
+
+        // Validasi confirm password
+        if (passwordConfirmInput) {
+            passwordConfirmInput.addEventListener('input', checkPasswordMatch);
+        }
+
+        // Fungsi untuk update rule visual
+        function updateRule(elementId, isValid, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (isValid) {
+                    element.className = 'text-success';
+                    element.innerHTML = '✓ ' + message;
+                } else {
+                    element.className = 'text-danger';
+                    element.innerHTML = '✗ ' + message;
+                }
+            }
+        }
+
+        // Fungsi untuk cek kecocokan password
+        function checkPasswordMatch() {
+            if (!passwordInput || !passwordConfirmInput || !passwordMatchDiv) return;
+            
+            const password = passwordInput.value;
+            const confirmPassword = passwordConfirmInput.value;
+            
+            if (confirmPassword === '') {
+                passwordMatchDiv.innerHTML = '';
+                passwordConfirmInput.classList.remove('is-valid', 'is-invalid');
+            } else if (password === confirmPassword) {
+                passwordMatchDiv.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Password cocok</small>';
+                passwordConfirmInput.classList.remove('is-invalid');
+                passwordConfirmInput.classList.add('is-valid');
+            } else {
+                passwordMatchDiv.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Password tidak cocok</small>';
+                passwordConfirmInput.classList.remove('is-valid');
+                passwordConfirmInput.classList.add('is-invalid');
+            }
         }
     });
 </script>

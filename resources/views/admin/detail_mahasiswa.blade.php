@@ -116,19 +116,77 @@
                     </div>
                     <div class="card-body">
                         @php
-                            $documents = [
-                                'ijazah_slta' => 'Ijazah SLTA',
-                                'foto_formal' => 'Foto Formal',
-                                'ktp' => 'KTP',
-                                'formulir_keabsahan' => 'Formulir Keabsahan',
-                                'formulir_pendaftaran' => 'Formulir Pendaftaran',
-                            ];
-
-                            if($mahasiswa->jalur_program === 'RPL') {
-                                $documents['ijazah_pendidikan_terakhir'] = 'Ijazah Pendidikan Terakhir';
-                                $documents['transkrip_nilai'] = 'Transkrip Nilai';
-                                $documents['ijazah_slta_asli'] = 'Ijazah SLTA Asli';
-                                $documents['riwayat_hidup'] = 'Riwayat Hidup';
+                            $documents = [];
+                            
+                            // Dokumen berdasarkan jenjang dan jalur program
+                            if(in_array($mahasiswa->jenjang, ['D3', 'D4'])) {
+                                // D3/D4 (RPL atau Non RPL - keduanya sama, 5 dokumen)
+                                $documents = [
+                                    'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                                    'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                                    'foto_formal' => 'Scan Foto Formal',
+                                    'ktp' => 'Scan KTP Asli',
+                                    'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                                ];
+                            }
+                            elseif($mahasiswa->jenjang === 'S1' && $mahasiswa->jalur_program === 'Non RPL') {
+                                // S1 Non RPL (5 dokumen)
+                                $documents = [
+                                    'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                                    'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                                    'foto_formal' => 'Scan Foto Formal',
+                                    'ktp' => 'Scan KTP Asli',
+                                    'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                                ];
+                            }
+                            elseif($mahasiswa->jenjang === 'S1' && $mahasiswa->jalur_program === 'RPL') {
+                                // S1 RPL (6 wajib + 1 opsional)
+                                $documents = [
+                                    'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                                    'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                                    'foto_formal' => 'Scan Foto Formal',
+                                    'ktp' => 'Scan KTP Asli',
+                                    'ijazah_slta_asli' => 'Ijazah SLTA Asli',
+                                    'transkrip_nilai' => 'Transkrip Nilai D3/D4/S1',
+                                    'ijazah_d3_d4_s1' => 'FC Ijazah D3/D4/S1 Legalisir (jika sudah lulus)',
+                                ];
+                            }
+                            elseif($mahasiswa->jenjang === 'S2') {
+                                // S2 Magister (14 dokumen)
+                                $documents = [
+                                    'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                                    'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                                    'foto_formal' => 'Scan Foto Formal',
+                                    'ktp' => 'Scan KTP Asli',
+                                    'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                                    'sertifikat_akreditasi_prodi' => 'Sertifikat Akreditasi Prodi D4/S1',
+                                    'transkrip_d3_d4_s1' => 'FC Ijazah dan Transkrip Nilai D4/S1 Legalisir',
+                                    'riwayat_hidup' => 'Daftar Riwayat Hidup',
+                                    'sertifikat_toefl' => 'Sertifikat TOEFL min. 450 (maks. 2 tahun terakhir)',
+                                    'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+                                    'sk_mampu_komputer' => 'SK Mampu Menggunakan Komputer',
+                                    'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
+                                    'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
+                                    'formulir_isian_foto' => 'Formulir Isian Foto',
+                                ];
+                            }
+                            elseif($mahasiswa->jenjang === 'S3') {
+                                // S3 Doktoral (13 dokumen)
+                                $documents = [
+                                    'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                                    'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                                    'foto_formal' => 'Scan Foto Formal',
+                                    'ktp' => 'Scan KTP Asli',
+                                    'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                                    'sertifikat_akreditasi_prodi' => 'Sertifikat Akreditasi Prodi S2',
+                                    'transkrip_d3_d4_s1' => 'FC Ijazah dan Transkrip Nilai S2 Legalisir',
+                                    'riwayat_hidup' => 'Daftar Riwayat Hidup',
+                                    'sertifikat_toefl' => 'Sertifikat TOEFL min. 500 (maks. 2 tahun terakhir)',
+                                    'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+                                    'sk_mampu_komputer' => 'SK Mampu Menggunakan Komputer',
+                                    'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
+                                    'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
+                                ];
                             }
                         @endphp
 

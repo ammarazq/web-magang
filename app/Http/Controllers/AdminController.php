@@ -147,7 +147,8 @@ class AdminController extends Controller
             abort(404, 'Dokumen tidak ditemukan.');
         }
 
-        $filePath = storage_path('app/public/' . $dokumen->$field);
+        // File sekarang ada di public/dokumen_mahasiswa/
+        $filePath = public_path('dokumen_mahasiswa/' . $dokumen->$field);
         
         if (!file_exists($filePath)) {
             abort(404, 'File tidak ditemukan di server.');
@@ -172,7 +173,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Dokumen tidak ditemukan.');
         }
 
-        $filePath = storage_path('app/public/' . $dokumen->$field);
+        // File sekarang ada di public/dokumen_mahasiswa/
+        $filePath = public_path('dokumen_mahasiswa/' . $dokumen->$field);
         
         if (!file_exists($filePath)) {
             return redirect()->back()->with('error', 'File tidak ditemukan di server.');

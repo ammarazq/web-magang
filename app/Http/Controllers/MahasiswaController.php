@@ -33,8 +33,8 @@ class MahasiswaController extends Controller
             ]);
         }
 
-        // Tentukan dokumen yang diperlukan berdasarkan jalur program
-        $requiredDocs = $this->getRequiredDocuments($mahasiswa->jalur_program);
+        // Tentukan dokumen yang diperlukan berdasarkan jenjang dan jalur program
+        $requiredDocs = $this->getRequiredDocuments($mahasiswa->jenjang, $mahasiswa->jalur_program);
         
         // Cek dokumen yang sudah diupload
         $uploadedDocs = $this->getUploadedDocuments($dokumen);
@@ -65,22 +65,36 @@ class MahasiswaController extends Controller
         // Validasi berdasarkan field yang diupload
         $rules = [];
         $fieldNames = [
-            'ijazah_slta' => 'Ijazah SLTA',
+            // Dokumen Umum
+            'formulir_pendaftaran' => 'Formulir Pendaftaran',
+            'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
             'foto_formal' => 'Foto Formal',
             'ktp' => 'KTP',
-            'formulir_keabsahan' => 'Formulir Keabsahan',
-            'formulir_pendaftaran' => 'Formulir Pendaftaran',
-            'ijazah_pendidikan_terakhir' => 'Ijazah Pendidikan Terakhir',
-            'transkrip_nilai' => 'Transkrip Nilai',
+            'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+            // Dokumen S1 RPL
             'ijazah_slta_asli' => 'Ijazah SLTA Asli',
-            'riwayat_hidup' => 'Riwayat Hidup',
+            'transkrip_nilai' => 'Transkrip Nilai D3/D4/S1',
+            'ijazah_d3_d4_s1' => 'FC Ijazah D3/D4/S1 Legalisir',
+            // Dokumen S2/S3
+            'sertifikat_akreditasi_prodi' => 'Sertifikat Akreditasi Prodi D4/S1',
+            'transkrip_d3_d4_s1' => 'FC Transkrip Nilai D4/S1 Legalisir',
+            'sertifikat_toefl' => 'Sertifikat TOEFL',
+            'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+            'sk_mampu_komputer' => 'SK Mampu menggunakan Komputer',
+            'bukti_tes_tpa' => 'Bukti Tes Potensi Akademik (TPA)',
+            'seleksi_tes_substansi' => 'Seleksi Tes Substansi',
+            'formulir_isian_foto' => 'Formulir Isian Foto',
+            'riwayat_hidup' => 'Daftar Riwayat Hidup',
+            'ijazah_s2' => 'FC Ijazah S2 Legalisir',
+            'transkrip_s2' => 'FC Transkrip Nilai S2 Legalisir',
+            'sertifikat_akreditasi_s2' => 'Sertifikat Akreditasi Prodi S2',
         ];
 
         foreach ($fieldNames as $field => $name) {
             if ($request->hasFile($field)) {
                 // Tentukan tipe file yang diizinkan
-                if (in_array($field, ['foto_formal', 'ktp', 'formulir_keabsahan', 'formulir_pendaftaran'])) {
-                    $rules[$field] = 'required|mimes:jpg,jpeg,png|max:2048';
+                if (in_array($field, ['foto_formal', 'ktp', 'formulir_keabsahan', 'formulir_pendaftaran', 'formulir_isian_foto'])) {
+                    $rules[$field] = 'required|mimes:jpg,jpeg,png,pdf|max:2048';
                 } else {
                     $rules[$field] = 'required|mimes:pdf|max:5120';
                 }
@@ -117,23 +131,72 @@ class MahasiswaController extends Controller
     }
 
     /**
-     * Get required documents based on jalur program
+     * Get required documents based on jenjang and jalur program
      */
-    private function getRequiredDocuments($jalurProgram)
+    private function getRequiredDocuments($jenjang, $jalurProgram)
     {
-        $docs = [
-            'ijazah_slta' => 'Ijazah SLTA',
-            'foto_formal' => 'Foto Formal',
-            'ktp' => 'KTP',
-            'formulir_keabsahan' => 'Formulir Keabsahan',
-            'formulir_pendaftaran' => 'Formulir Pendaftaran',
-        ];
-
-        if ($jalurProgram === 'RPL') {
-            $docs['ijazah_pendidikan_terakhir'] = 'Ijazah Pendidikan Terakhir';
-            $docs['transkrip_nilai'] = 'Transkrip Nilai';
-            $docs['ijazah_slta_asli'] = 'Ijazah SLTA Asli';
-            $docs['riwayat_hidup'] = 'Riwayat Hidup';
+        $docs = [];
+        
+        // D3/D4/S1 REGULER
+        if (in_array($jenjang, ['D3', 'D4', 'S1']) && $jalurProgram === 'Non RPL') {
+            $docs = [
+                'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                'foto_formal' => 'Scan Foto Formal',
+                'ktp' => 'Scan KTP Asli',
+                'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+            ];
+        }
+        // S1 RPL
+        elseif ($jenjang === 'S1' && $jalurProgram === 'RPL') {
+            $docs = [
+                'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                'ktp' => 'Scan KTP Asli',
+                'ijazah_slta_asli' => 'Ijazah SLTA Asli',
+                'transkrip_nilai' => 'Transkrip Nilai D3/D4/S1',
+                'ijazah_d3_d4_s1' => 'FC Ijazah D3/D4/S1 Legalisir (Jika sudah lulus)',
+            ];
+        }
+        // S2
+        elseif ($jenjang === 'S2') {
+            $docs = [
+                'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                'foto_formal' => 'Scan Foto Formal',
+                'ktp' => 'Scan KTP Asli',
+                'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                'sertifikat_akreditasi_prodi' => 'Sertifikat Akreditasi Prodi D4/S1',
+                'ijazah_d3_d4_s1' => 'FC Ijazah D4/S1 Legalisir',
+                'transkrip_d3_d4_s1' => 'FC Transkrip Nilai D4/S1 Legalisir',
+                'riwayat_hidup' => 'Daftar Riwayat Hidup',
+                'sertifikat_toefl' => 'Sertifikat TOEFL min. 450 (maksimal 2 tahun terakhir)',
+                'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+                'sk_mampu_komputer' => 'SK Mampu menggunakan Komputer',
+                'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
+                'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
+                'formulir_isian_foto' => 'Formulir Isian Foto',
+            ];
+        }
+        // S3
+        elseif ($jenjang === 'S3') {
+            $docs = [
+                'formulir_pendaftaran' => 'Formulir Pendaftaran',
+                'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
+                'foto_formal' => 'Scan Foto Formal',
+                'ktp' => 'Scan KTP Asli',
+                'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
+                'sertifikat_akreditasi_s2' => 'Sertifikat Akreditasi Prodi S2',
+                'ijazah_s2' => 'FC Ijazah S2 Legalisir',
+                'transkrip_s2' => 'FC Transkrip Nilai S2 Legalisir',
+                'riwayat_hidup' => 'Daftar Riwayat Hidup',
+                'sertifikat_toefl' => 'Sertifikat TOEFL min. 500 (maksimal 2 tahun terakhir)',
+                'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+                'sk_mampu_komputer' => 'SK Mampu menggunakan Komputer',
+                'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
+                'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
+                'formulir_isian_foto' => 'Formulir Isian Foto',
+            ];
         }
 
         return $docs;
@@ -146,15 +209,26 @@ class MahasiswaController extends Controller
     {
         $uploaded = [];
         $fields = [
-            'ijazah_slta' => 'Ijazah SLTA',
+            'formulir_pendaftaran' => 'Formulir Pendaftaran',
+            'formulir_keabsahan' => 'Lembar Keabsahan Dokumen',
             'foto_formal' => 'Foto Formal',
             'ktp' => 'KTP',
-            'formulir_keabsahan' => 'Formulir Keabsahan',
-            'formulir_pendaftaran' => 'Formulir Pendaftaran',
-            'ijazah_pendidikan_terakhir' => 'Ijazah Pendidikan Terakhir',
-            'transkrip_nilai' => 'Transkrip Nilai',
+            'ijazah_slta' => 'FC Ijazah SLTA Legalisir',
             'ijazah_slta_asli' => 'Ijazah SLTA Asli',
-            'riwayat_hidup' => 'Riwayat Hidup',
+            'transkrip_nilai' => 'Transkrip Nilai',
+            'ijazah_d3_d4_s1' => 'FC Ijazah D3/D4/S1 Legalisir',
+            'sertifikat_akreditasi_prodi' => 'Sertifikat Akreditasi Prodi',
+            'transkrip_d3_d4_s1' => 'FC Transkrip Nilai D4/S1 Legalisir',
+            'sertifikat_toefl' => 'Sertifikat TOEFL',
+            'rancangan_penelitian' => 'Rancangan Penelitian Singkat',
+            'sk_mampu_komputer' => 'SK Mampu menggunakan Komputer',
+            'bukti_tes_tpa' => 'Bukti Tes TPA',
+            'seleksi_tes_substansi' => 'Seleksi Tes Substansi',
+            'formulir_isian_foto' => 'Formulir Isian Foto',
+            'riwayat_hidup' => 'Daftar Riwayat Hidup',
+            'ijazah_s2' => 'FC Ijazah S2 Legalisir',
+            'transkrip_s2' => 'FC Transkrip Nilai S2 Legalisir',
+            'sertifikat_akreditasi_s2' => 'Sertifikat Akreditasi Prodi S2',
         ];
 
         foreach ($fields as $field => $name) {

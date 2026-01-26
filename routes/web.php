@@ -159,3 +159,18 @@ Route::get('/magister/captcha/refresh', [MagisterController::class, 'generateCap
 Route::get('/doktoral', [DoktoralController::class, 'index'])->name('doktoral');
 Route::post('/doktoral/submit', [DoktoralController::class, 'submit'])->name('doktoral.submit');
 Route::get('/doktoral/captcha/refresh', [DoktoralController::class, 'generateCaptcha'])->name('doktoral.captcha.refresh');
+
+// Upload Dokumen Routes (Semua Jenjang)
+Route::middleware(['auth'])->group(function () {
+    // Sarjana (D3/D4/S1)
+    Route::get('/sarjana/upload', [SarjanaController::class, 'uploadForm'])->name('sarjana.upload');
+    Route::post('/sarjana/upload', [SarjanaController::class, 'uploadDokumen'])->name('sarjana.upload.submit');
+    
+    // Magister (S2)
+    Route::get('/magister/upload', [MagisterController::class, 'uploadForm'])->name('magister.upload');
+    Route::post('/magister/upload', [MagisterController::class, 'uploadDokumen'])->name('magister.upload.submit');
+    
+    // Doktoral (S3)
+    Route::get('/doktoral/upload', [DoktoralController::class, 'uploadForm'])->name('doktoral.upload');
+    Route::post('/doktoral/upload', [DoktoralController::class, 'uploadDokumen'])->name('doktoral.upload.submit');
+});

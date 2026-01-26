@@ -80,7 +80,47 @@ class SarjanaController extends Controller
             'program_studi'   => 'required|string',
             'no_hp'           => 'required|numeric|digits_between:10,15',
             'email'           => 'required|email|max:255|unique:mahasiswa,email',
-            'password'        => 'required|min:8|confirmed',
+            'password'        => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/[a-z]/',      // minimal 1 huruf kecil
+                'regex:/[A-Z]/',      // minimal 1 huruf besar
+                'regex:/[0-9]/',      // minimal 1 angka
+                'regex:/[!@#$%^&*()_+\-=\[\]{};:\'",.<>\/?\\|`~]/', // minimal 1 karakter spesial
+                function ($attribute, $value, $fail) {
+                    // Cek urutan angka (123, 234, 321, dst)
+                    for ($i = 0; $i < strlen($value) - 2; $i++) {
+                        if (is_numeric($value[$i]) && is_numeric($value[$i+1]) && is_numeric($value[$i+2])) {
+                            $num1 = (int)$value[$i];
+                            $num2 = (int)$value[$i+1];
+                            $num3 = (int)$value[$i+2];
+                            
+                            if (($num2 === $num1 + 1 && $num3 === $num2 + 1) || 
+                                ($num2 === $num1 - 1 && $num3 === $num2 - 1)) {
+                                $fail('Password tidak boleh mengandung angka berurutan (contoh: 123, 234, 321).');
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Cek urutan huruf (abc, bcd, xyz, dst)
+                    $lower = strtolower($value);
+                    for ($i = 0; $i < strlen($lower) - 2; $i++) {
+                        if (ctype_alpha($lower[$i]) && ctype_alpha($lower[$i+1]) && ctype_alpha($lower[$i+2])) {
+                            $char1 = ord($lower[$i]);
+                            $char2 = ord($lower[$i+1]);
+                            $char3 = ord($lower[$i+2]);
+                            
+                            if (($char2 === $char1 + 1 && $char3 === $char2 + 1) || 
+                                ($char2 === $char1 - 1 && $char3 === $char2 - 1)) {
+                                $fail('Password tidak boleh mengandung huruf berurutan (contoh: abc, xyz, cba).');
+                                return;
+                            }
+                        }
+                    }
+                }
+            ],
             'captcha_answer'  => 'required|numeric',
         ];
 
@@ -113,6 +153,7 @@ class SarjanaController extends Controller
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 8 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan karakter spesial.',
             'captcha_answer.required' => 'Jawaban captcha wajib diisi.',
             'captcha_answer.numeric' => 'Jawaban captcha harus berupa angka.',
         ];
@@ -214,6 +255,118 @@ class SarjanaController extends Controller
             return back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()])
                 ->withInput($request->except('password', 'password_confirmation'));
+        }
+    }
+
+    /**
+     * Tampilkan form upload dokumen sarjana (D3/D4/S1)
+     */
+    public function uploadForm()
+    {
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+        
+        if (!$mahasiswa) {
+            return redirect()->route('login')->with('error', 'Data mahasiswa tidak ditemukan');
+        }
+
+        // Ambil atau buat data dokumen
+        $dokumen = $mahasiswa->dokumen ?? new \App\Models\DokumenMahasiswa(['mahasiswa_id' => $mahasiswa->id]);
+        
+        // Tentukan view berdasarkan jenjang
+        $jenjang = strtolower($mahasiswa->jenjang);
+        $viewName = 'pages.' . $jenjang . '-upload';
+        
+        // Cek apakah view ada, jika tidak gunakan default
+        if (!view()->exists($viewName)) {
+            return redirect()->route('mahasiswa.dashboard')->with('error', 'Halaman upload untuk jenjang ' . $mahasiswa->jenjang . ' belum tersedia');
+        }
+        
+        return view($viewName, compact('mahasiswa', 'dokumen'));
+    }
+
+    /**
+     * Proses upload dokumen sarjana (D3/D4/S1)
+     */
+    public function uploadDokumen(Request $request)
+    {
+        $user = auth()->user();
+        $mahasiswa = Mahasiswa::where('user_id', $user->id)->first();
+        
+        if (!$mahasiswa) {
+            return redirect()->route('login')->with('error', 'Data mahasiswa tidak ditemukan');
+        }
+
+        // Validasi file upload berdasarkan jenjang
+        $rules = [
+            'formulir_pendaftaran' => 'nullable|file|mimes:jpg,jpeg,pdf|max:5120',
+            'formulir_keabsahan' => 'nullable|file|mimes:jpg,jpeg,pdf|max:5120',
+            'foto_formal' => 'nullable|file|mimes:jpg,jpeg|max:2048',
+            'ktp' => 'nullable|file|mimes:jpg,jpeg|max:2048',
+            'ijazah_slta' => 'nullable|file|mimes:pdf|max:5120',
+        ];
+
+        // Tambahan untuk S1 RPL
+        if ($mahasiswa->jenjang === 'S1' && $mahasiswa->jalur_program === 'RPL') {
+            $rules['ijazah_slta_asli'] = 'nullable|file|mimes:pdf|max:5120';
+            $rules['transkrip_nilai'] = 'nullable|file|mimes:pdf|max:5120';
+            $rules['ijazah_d3_d4_s1'] = 'nullable|file|mimes:pdf|max:5120';
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules, [
+            '*.mimes' => 'File :attribute harus berformat :values',
+            '*.max' => 'Ukuran file :attribute terlalu besar. Maksimal :max KB (5MB untuk PDF, 2MB untuk gambar)',
+            '*.file' => 'File :attribute tidak valid',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            // Ambil atau buat data dokumen
+            $dokumen = $mahasiswa->dokumen;
+            if (!$dokumen) {
+                $dokumen = new \App\Models\DokumenMahasiswa();
+                $dokumen->mahasiswa_id = $mahasiswa->id;
+            }
+            
+            // Upload file yang ada
+            $uploadedFiles = [];
+            $fields = [
+                'formulir_pendaftaran', 'formulir_keabsahan', 'foto_formal', 'ktp', 'ijazah_slta'
+            ];
+
+            // Tambah field untuk RPL
+            if ($mahasiswa->jenjang === 'S1' && $mahasiswa->jalur_program === 'RPL') {
+                $fields = array_merge($fields, ['ijazah_slta_asli', 'transkrip_nilai', 'ijazah_d3_d4_s1']);
+            }
+
+            foreach ($fields as $field) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $fileName = $mahasiswa->id . '_' . $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    // Simpan langsung ke public/dokumen_mahasiswa
+                    $file->move(public_path('dokumen_mahasiswa'), $fileName);
+                    $dokumen->$field = $fileName;
+                    $uploadedFiles[] = $field;
+                }
+            }
+
+            // Update status dokumen
+            if (count($uploadedFiles) > 0) {
+                // Cek apakah dokumen sudah lengkap
+                if ($dokumen->isDokumenLengkap()) {
+                    $dokumen->status_dokumen = 'lengkap';
+                }
+                $dokumen->save();
+                return redirect()->back()->with('success', 'Berhasil mengupload ' . count($uploadedFiles) . ' dokumen');
+            } else {
+                return redirect()->back()->with('info', 'Tidak ada dokumen yang diupload');
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 }
