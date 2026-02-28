@@ -130,17 +130,72 @@
                         </p>
                     </div>
                 </div>
+
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="fas fa-list-check"></i> Kelengkapan Dokumen</h6>
+                        <hr>
+                        <div class="progress mb-2" style="height: 25px;">
+                            @php
+                                // Dokumen wajib S3: 11 dokumen
+                                $total = 11;
+                                $uploaded = 0;
+                                if($dokumen) {
+                                    if($dokumen->formulir_pendaftaran) $uploaded++;
+                                    if($dokumen->formulir_keabsahan) $uploaded++;
+                                    if($dokumen->foto_formal) $uploaded++;
+                                    if($dokumen->ktp) $uploaded++;
+                                    if($dokumen->ijazah_slta) $uploaded++;
+                                    if($dokumen->ijazah_s2) $uploaded++;
+                                    if($dokumen->transkrip_s2) $uploaded++;
+                                    if($dokumen->sertifikat_akreditasi_s2) $uploaded++;
+                                    if($dokumen->sertifikat_toefl) $uploaded++;
+                                    if($dokumen->rancangan_penelitian) $uploaded++;
+                                    if($dokumen->berkas_dokumen_pendaftaran) $uploaded++;
+                                }
+                                $percentage = $total > 0 ? ($uploaded / $total) * 100 : 0;
+                            @endphp
+                            <div class="progress-bar {{ $percentage == 100 ? 'bg-success' : 'bg-warning' }}" 
+                                 role="progressbar" 
+                                 style="width: {{ $percentage }}%;" 
+                                 aria-valuenow="{{ $percentage }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ $uploaded }}/{{ $total }}
+                            </div>
+                        </div>
+                        <small class="text-muted">{{ round($percentage) }}% dokumen wajib terupload</small>
+                    </div>
+                </div>
             </div>
 
             <div class="col-md-9">
                 <form action="{{ route('doktoral.upload.submit') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
+                    <!-- Informasi Dokumen -->
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informasi:</h6>
+                        <small>
+                            <ul class="mb-0">
+                                <li>Upload dokumen persyaratan untuk program <strong>Doktoral (S3)</strong></li>
+                                <li>Pastikan semua dokumen dalam format yang benar (PDF/JPG)</li>
+                                <li>Ukuran maksimal file: 2MB per dokumen (5MB untuk file PDF tertentu)</li>
+                                <li>Upload dokumen dengan jelas dan terbaca</li>
+                                <li>Dokumen yang sudah diupload bisa diupdate/diganti</li>
+                                <li>Anda dapat mengupload dokumen secara bertahap</li>
+                            </ul>
+                        </small>
+                    </div>
+
                     <!-- Dokumen Umum -->
                     <div class="upload-section">
                         <h5 class="mb-3">
-                            <i class="fas fa-folder"></i> Dokumen Umum
+                            <i class="fas fa-folder"></i> Dokumen Persyaratan S3
                         </h5>
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-exclamation-circle"></i> Dokumen bertanda <span class="required-badge">WAJIB</span> harus diupload.
+                        </p>
 
                         <div class="upload-item {{ $dokumen->formulir_pendaftaran ? 'uploaded' : '' }}">
                             <label class="form-label">
@@ -325,11 +380,6 @@
                                 @endif
                             </div>
                         </div>
-                                @if($dokumen->transkrip_d3_d4_s1)
-                                    <br><strong>File saat ini:</strong> {{ $dokumen->transkrip_d3_d4_s1 }}
-                                @endif
-                            </div>
-                        </div>
 
                         <div class="upload-item {{ $dokumen->sertifikat_toefl ? 'uploaded' : '' }}">
                             <label class="form-label">
@@ -365,7 +415,7 @@
                             </div>
                         </div>
 
-        <div class="upload-item {{ $dokumen->sk_mampu_komputer ? 'uploaded' : '' }}">
+                        <div class="upload-item {{ $dokumen->sk_mampu_komputer ? 'uploaded' : '' }}">
                             <label class="form-label">
                                 <i class="fas fa-laptop"></i> SK Mampu Menggunakan Komputer
                                 <span class="required-badge">WAJIB</span>
@@ -432,6 +482,44 @@
                                 @endif
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Dokumen Berkas Pendaftaran -->
+                    <div class="upload-section">
+                        <h5 class="mb-3">
+                            <i class="fas fa-file-signature"></i> Berkas Dokumen Pendaftaran
+                        </h5>
+
+                        <div class="upload-item {{ $dokumen->berkas_dokumen_pendaftaran ? 'uploaded' : '' }}">
+                            <label class="form-label">
+                                <i class="fas fa-file-pdf"></i> Berkas Dokumen Pendaftaran yang Sudah Diisi
+                                <span class="required-badge">WAJIB</span>
+                                @if($dokumen->berkas_dokumen_pendaftaran)
+                                    <span class="uploaded-badge"><i class="fas fa-check"></i> Sudah Diupload</span>
+                                @endif
+                            </label>
+                            <input type="file" class="form-control" name="berkas_dokumen_pendaftaran" accept=".pdf">
+                            <div class="file-info mt-1">
+                                <i class="fas fa-info-circle"></i> Format: PDF, Maks: 5MB (Dokumen pendaftaran yang telah diisi lengkap dan ditandatangani)
+                                @if($dokumen->berkas_dokumen_pendaftaran)
+                                    <br><strong>File saat ini:</strong> {{ $dokumen->berkas_dokumen_pendaftaran }}
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Catatan Penting -->
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Catatan Penting:</h6>
+                        <small>
+                            <ul class="mb-0">
+                                <li>Pastikan semua dokumen telah diisi jelas dan mudah dibaca</li>
+                                <li>File yang telah diupload dapat diganti dengan upload ulang</li>
+                                <li>Dokumen akan diverifikasi oleh admin setelah lengkap</li>
+                                <li>Anda dapat mengupload dokumen secara bertahap</li>
+                                <li>Dokumen opsional tidak wajib diupload namun dapat melengkapi berkas Anda</li>
+                            </ul>
+                        </small>
                     </div>
 
                     <div class="d-grid gap-2 mb-4">

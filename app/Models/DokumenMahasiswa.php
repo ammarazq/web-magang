@@ -37,6 +37,8 @@ class DokumenMahasiswa extends Model
         'ijazah_s2',
         'transkrip_s2',
         'sertifikat_akreditasi_s2',
+        // Berkas Dokumen Pendaftaran (untuk S2 dan S3)
+        'berkas_dokumen_pendaftaran',
         // Status
         'status_dokumen',
         'catatan_verifikasi',
@@ -122,7 +124,8 @@ class DokumenMahasiswa extends Model
                    !empty($this->sk_mampu_komputer) &&
                    !empty($this->bukti_tes_tpa) &&
                    !empty($this->seleksi_tes_substansi) &&
-                   !empty($this->formulir_isian_foto);
+                   !empty($this->formulir_isian_foto) &&
+                   !empty($this->berkas_dokumen_pendaftaran);
         }
         
         // S3
@@ -139,7 +142,8 @@ class DokumenMahasiswa extends Model
                    !empty($this->rancangan_penelitian) &&
                    !empty($this->sk_mampu_komputer) &&
                    !empty($this->bukti_tes_tpa) &&
-                   !empty($this->seleksi_tes_substansi);
+                   !empty($this->seleksi_tes_substansi) &&
+                   !empty($this->berkas_dokumen_pendaftaran);
         }
         
         return false;
@@ -192,7 +196,7 @@ class DokumenMahasiswa extends Model
         }
         // S2
         elseif ($jenjang === 'S2') {
-            $required = 9; // Hanya dokumen wajib
+            $required = 10; // Hanya dokumen wajib
             if ($this->formulir_pendaftaran) $uploaded++;
             if ($this->formulir_keabsahan) $uploaded++;
             if ($this->foto_formal) $uploaded++;
@@ -202,6 +206,7 @@ class DokumenMahasiswa extends Model
             if ($this->transkrip_d3_d4_s1) $uploaded++;
             if ($this->sertifikat_toefl) $uploaded++;
             if ($this->rancangan_penelitian) $uploaded++;
+            if ($this->berkas_dokumen_pendaftaran) $uploaded++;
             // Dokumen opsional TIDAK dihitung:
             // - riwayat_hidup
             // - sk_mampu_komputer
@@ -211,7 +216,7 @@ class DokumenMahasiswa extends Model
         }
         // S3
         elseif ($jenjang === 'S3') {
-            $required = 10; // Hanya dokumen wajib sesuai UPLOAD_DOKUMEN_GUIDE.md
+            $required = 11; // Hanya dokumen wajib sesuai UPLOAD_DOKUMEN_GUIDE.md
             if ($this->formulir_pendaftaran) $uploaded++;
             if ($this->formulir_keabsahan) $uploaded++;
             if ($this->foto_formal) $uploaded++;
@@ -222,6 +227,7 @@ class DokumenMahasiswa extends Model
             if ($this->sertifikat_akreditasi_s2) $uploaded++;
             if ($this->sertifikat_toefl) $uploaded++;
             if ($this->rancangan_penelitian) $uploaded++; // Proposal Penelitian/Disertasi
+            if ($this->berkas_dokumen_pendaftaran) $uploaded++;
             // Dokumen opsional TIDAK dihitung:
             // - sertifikat_akreditasi_s1
             // - transkrip_d3_d4_s1 (transkrip S1)

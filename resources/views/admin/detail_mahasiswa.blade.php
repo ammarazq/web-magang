@@ -168,6 +168,7 @@
                                     'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
                                     'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
                                     'formulir_isian_foto' => 'Formulir Isian Foto',
+                                    'berkas_dokumen_pendaftaran' => 'Berkas Dokumen Pendaftaran yang Sudah Diisi',
                                 ];
                             }
                             elseif($mahasiswa->jenjang === 'S3') {
@@ -186,6 +187,7 @@
                                     'sk_mampu_komputer' => 'SK Mampu Menggunakan Komputer',
                                     'bukti_tes_tpa' => 'Bukti telah mengikuti Tes Potensi Akademik (TPA)',
                                     'seleksi_tes_substansi' => 'Mengikuti Seleksi Tes Substansi',
+                                    'berkas_dokumen_pendaftaran' => 'Berkas Dokumen Pendaftaran yang Sudah Diisi',
                                 ];
                             }
                         @endphp

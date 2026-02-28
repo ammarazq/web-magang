@@ -748,6 +748,35 @@
                     </div>
                 </div>
 
+                <!-- 16. Berkas Dokumen Pendaftaran -->
+                <div class="document-item {{ $dokumen->berkas_dokumen_pendaftaran ? 'uploaded' : '' }}">
+                    <div class="d-flex align-items-start">
+                        <span class="document-number">16</span>
+                        <div class="flex-grow-1">
+                            <div class="document-label">Berkas Dokumen Pendaftaran yang Sudah Diisi</div>
+                            <div class="document-note">Dokumen pendaftaran yang telah diisi lengkap dan ditandatangani</div>
+                            @if($dokumen->berkas_dokumen_pendaftaran)
+                                <span class="status-badge status-uploaded">
+                                    <i class="fas fa-check-circle"></i> Sudah Diupload
+                                </span>
+                                <a href="{{ asset('storage/' . $dokumen->berkas_dokumen_pendaftaran) }}" target="_blank" class="view-button ms-2">
+                                    <i class="fas fa-eye"></i> Lihat File
+                                </a>
+                            @else
+                                <div class="file-input-custom">
+                                    <input type="file" name="berkas_dokumen_pendaftaran" class="form-control" accept=".pdf">
+                                    <div class="file-info">
+                                        <i class="fas fa-info-circle"></i> Format: PDF | Max: 5MB
+                                    </div>
+                                </div>
+                                <span class="status-badge status-missing">
+                                    <i class="fas fa-exclamation-circle"></i> Belum Diupload
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
                 <div class="text-center mt-4">
                     <button type="submit" class="btn-upload">
                         <i class="fas fa-cloud-upload-alt"></i> Upload Dokumen

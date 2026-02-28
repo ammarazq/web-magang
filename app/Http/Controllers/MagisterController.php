@@ -252,6 +252,7 @@ class MagisterController extends Controller
             'seleksi_tes_substansi' => 'nullable|file|mimes:pdf|max:5120',
             'formulir_isian_foto' => 'nullable|file|mimes:jpg,jpeg,pdf|max:2048',
             'riwayat_hidup' => 'nullable|file|mimes:pdf|max:5120',
+            'berkas_dokumen_pendaftaran' => 'nullable|file|mimes:pdf|max:5120',
         ], [
             '*.mimes' => 'File :attribute harus berformat :values',
             '*.max' => 'Ukuran file :attribute terlalu besar. Maksimal :max KB (5MB untuk PDF, 2MB untuk gambar)',
@@ -276,7 +277,7 @@ class MagisterController extends Controller
                 'formulir_pendaftaran', 'formulir_keabsahan', 'foto_formal', 'ktp', 'ijazah_slta',
                 'sertifikat_akreditasi_prodi', 'transkrip_d3_d4_s1', 'sertifikat_toefl',
                 'rancangan_penelitian', 'sk_mampu_komputer', 'bukti_tes_tpa',
-                'seleksi_tes_substansi', 'formulir_isian_foto', 'riwayat_hidup'
+                'seleksi_tes_substansi', 'formulir_isian_foto', 'riwayat_hidup', 'berkas_dokumen_pendaftaran'
             ];
 
             foreach ($fields as $field) {

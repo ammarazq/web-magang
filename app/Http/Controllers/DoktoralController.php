@@ -255,6 +255,7 @@ class DoktoralController extends Controller
             'ijazah_s2' => 'nullable|file|mimes:pdf|max:5120',
             'transkrip_s2' => 'nullable|file|mimes:pdf|max:5120',
             'sertifikat_akreditasi_s2' => 'nullable|file|mimes:pdf|max:5120',
+            'berkas_dokumen_pendaftaran' => 'nullable|file|mimes:pdf|max:5120',
         ], [
             '*.mimes' => 'File :attribute harus berformat :values',
             '*.max' => 'Ukuran file :attribute terlalu besar. Maksimal :max KB (5MB untuk PDF, 2MB untuk gambar)',
@@ -280,7 +281,7 @@ class DoktoralController extends Controller
                 'sertifikat_akreditasi_prodi', 'transkrip_d3_d4_s1', 'sertifikat_toefl',
                 'rancangan_penelitian', 'sk_mampu_komputer', 'bukti_tes_tpa',
                 'seleksi_tes_substansi', 'formulir_isian_foto', 'riwayat_hidup',
-                'ijazah_s2', 'transkrip_s2', 'sertifikat_akreditasi_s2'
+                'ijazah_s2', 'transkrip_s2', 'sertifikat_akreditasi_s2', 'berkas_dokumen_pendaftaran'
             ];
 
             foreach ($fields as $field) {

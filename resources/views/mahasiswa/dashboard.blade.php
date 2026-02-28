@@ -77,6 +77,63 @@
             </div>
 
             <div class="col-md-8">
+                <!-- Konten Utama Upload Dokumen -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-upload"></i> Upload Dokumen Pendaftaran
+                    </div>
+                    <div class="card-body text-center py-5">
+                        @if($mahasiswa->jenjang === 'S2')
+                            <div class="mb-4">
+                                <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
+                                <h4>Program Magister (S2)</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran sesuai persyaratan</p>
+                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 10 dokumen wajib</p>
+                            </div>
+                            <a href="{{ route('magister.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen S2
+                            </a>
+                        @elseif($mahasiswa->jenjang === 'S3')
+                            <div class="mb-4">
+                                <i class="fas fa-user-graduate fa-4x text-primary mb-3"></i>
+                                <h4>Program Doktoral (S3)</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran sesuai persyaratan</p>
+                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 11 dokumen wajib</p>
+                            </div>
+                            <a href="{{ route('doktoral.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen S3
+                            </a>
+                        @elseif(in_array($mahasiswa->jenjang, ['D3', 'D4', 'S1']))
+                            <div class="mb-4">
+                                <i class="fas fa-university fa-4x text-primary mb-3"></i>
+                                <h4>Program {{ $mahasiswa->jenjang }} @if($mahasiswa->jalur_program === 'RPL')(RPL)@endif</h4>
+                                <p class="text-muted">Upload dokumen pendaftaran sesuai persyaratan</p>
+                                @if($mahasiswa->jalur_program === 'RPL')
+                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 6 dokumen wajib + 1 opsional</p>
+                                @else
+                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 5 dokumen wajib</p>
+                                @endif
+                            </div>
+                            <a href="{{ route('sarjana.upload') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-file-upload"></i> Upload Dokumen {{ $mahasiswa->jenjang }}
+                            </a>
+                        @endif
+
+                        <div class="mt-4">
+                            <div class="alert alert-info text-start">
+                                <i class="fas fa-info-circle"></i> <strong>Informasi:</strong>
+                                <ul class="mb-0 mt-2">
+                                    <li>Pastikan semua dokumen dalam format yang benar (PDF/JPG)</li>
+                                    <li>Ukuran maksimal file: 2MB per dokumen</li>
+                                    <li>Upload dokumen dengan jelas dan terbaca</li>
+                                    <li>Dokumen yang sudah diupload bisa diupdate/diganti</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Dokumen -->
                 <div class="card card-status status-{{ $dokumen->status_dokumen }} mb-4">
                     <div class="card-body">
                         <h5 class="card-title">
@@ -140,69 +197,13 @@
                 </div>
                 @endif
 
-                <!-- Tombol Upload Dokumen -->
-                @if($dokumen->status_dokumen !== 'diverifikasi')
+                <!-- Pesan Jika Sudah Diverifikasi -->
+                @if($dokumen->status_dokumen === 'diverifikasi')
                 <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-upload"></i> Upload Dokumen Pendaftaran
-                    </div>
-                    <div class="card-body text-center py-5">
-                        @if($mahasiswa->jenjang === 'S2')
-                            <div class="mb-4">
-                                <i class="fas fa-graduation-cap fa-4x text-primary mb-3"></i>
-                                <h4>Program Magister (S2)</h4>
-                                <p class="text-muted">Upload dokumen pendaftaran S2 sesuai persyaratan</p>
-                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 14 dokumen wajib</p>
-                            </div>
-                            <a href="{{ route('magister.upload') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-file-upload"></i> Upload Dokumen S2
-                            </a>
-                        @elseif($mahasiswa->jenjang === 'S3')
-                            <div class="mb-4">
-                                <i class="fas fa-user-graduate fa-4x text-primary mb-3"></i>
-                                <h4>Program Doktoral (S3)</h4>
-                                <p class="text-muted">Upload dokumen pendaftaran S3 sesuai persyaratan</p>
-                                <p class="mb-3"><strong>Jumlah Dokumen:</strong> 13 dokumen wajib</p>
-                            </div>
-                            <a href="{{ route('doktoral.upload') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-file-upload"></i> Upload Dokumen S3
-                            </a>
-                        @elseif(in_array($mahasiswa->jenjang, ['D3', 'D4', 'S1']))
-                            <div class="mb-4">
-                                <i class="fas fa-university fa-4x text-primary mb-3"></i>
-                                <h4>Program {{ $mahasiswa->jenjang }} @if($mahasiswa->jalur_program === 'RPL')(RPL)@endif</h4>
-                                <p class="text-muted">Upload dokumen pendaftaran sesuai persyaratan</p>
-                                @if($mahasiswa->jalur_program === 'RPL')
-                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 6 dokumen wajib + 1 opsional</p>
-                                @else
-                                    <p class="mb-3"><strong>Jumlah Dokumen:</strong> 5 dokumen wajib</p>
-                                @endif
-                            </div>
-                            <a href="{{ route('sarjana.upload') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-file-upload"></i> Upload Dokumen {{ $mahasiswa->jenjang }}
-                            </a>
-                        @endif
-
-                        <div class="mt-4">
-                            <div class="alert alert-info text-start">
-                                <i class="fas fa-info-circle"></i> <strong>Informasi:</strong>
-                                <ul class="mb-0 mt-2">
-                                    <li>Pastikan semua dokumen dalam format yang benar (PDF/JPG)</li>
-                                    <li>Ukuran maksimal file: 2MB per dokumen</li>
-                                    <li>Upload dokumen dengan jelas dan terbaca</li>
-                                    <li>Dokumen yang sudah diupload bisa diupdate/diganti</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @else
-                <div class="card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-                        <h4 class="text-success">Dokumen Sudah Diverifikasi</h4>
-                        <p class="text-muted">Dokumen Anda sudah diverifikasi dan disetujui oleh admin.</p>
-                        <p>Silakan menunggu informasi selanjutnya melalui email.</p>
+                    <div class="card-body text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">Dokumen Sudah Diverifikasi</h5>
+                        <p class="text-muted mb-0">Dokumen Anda sudah diverifikasi dan disetujui oleh admin.</p>
                     </div>
                 </div>
                 @endif
