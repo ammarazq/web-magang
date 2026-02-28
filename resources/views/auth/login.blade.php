@@ -152,7 +152,8 @@
                 <input type="checkbox" 
                        class="form-check-input" 
                        id="remember" 
-                       name="remember">
+                       name="remember"
+                       required>
                 <label class="form-check-label" for="remember">
                     Ingat saya
                 </label>
