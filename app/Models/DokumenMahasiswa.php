@@ -181,19 +181,18 @@ class DokumenMahasiswa extends Model
         }
         // S1 RPL
         elseif ($jenjang === 'S1' && $jalurProgram === 'RPL') {
-            $required = 6; // 6 wajib, ijazah_d3_d4_s1 opsional
+            $required = 6; // 6 wajib, ijazah_d3_d4_s1 opsional (tidak dihitung)
             if ($this->formulir_pendaftaran) $uploaded++;
             if ($this->formulir_keabsahan) $uploaded++;
             if ($this->foto_formal) $uploaded++;
             if ($this->ktp) $uploaded++;
             if ($this->ijazah_slta_asli) $uploaded++;
             if ($this->transkrip_nilai) $uploaded++;
-            // ijazah_d3_d4_s1 dihitung bonus jika ada
-            if ($this->ijazah_d3_d4_s1) $uploaded++;
+            // ijazah_d3_d4_s1 opsional, TIDAK dihitung agar max 100%
         }
         // S2
         elseif ($jenjang === 'S2') {
-            $required = 14;
+            $required = 9; // Hanya dokumen wajib
             if ($this->formulir_pendaftaran) $uploaded++;
             if ($this->formulir_keabsahan) $uploaded++;
             if ($this->foto_formal) $uploaded++;
@@ -201,30 +200,36 @@ class DokumenMahasiswa extends Model
             if ($this->ijazah_slta) $uploaded++;
             if ($this->sertifikat_akreditasi_prodi) $uploaded++;
             if ($this->transkrip_d3_d4_s1) $uploaded++;
-            if ($this->riwayat_hidup) $uploaded++;
             if ($this->sertifikat_toefl) $uploaded++;
             if ($this->rancangan_penelitian) $uploaded++;
-            if ($this->sk_mampu_komputer) $uploaded++;
-            if ($this->bukti_tes_tpa) $uploaded++;
-            if ($this->seleksi_tes_substansi) $uploaded++;
-            if ($this->formulir_isian_foto) $uploaded++;
+            // Dokumen opsional TIDAK dihitung:
+            // - riwayat_hidup
+            // - sk_mampu_komputer
+            // - bukti_tes_tpa
+            // - seleksi_tes_substansi
+            // - formulir_isian_foto
         }
         // S3
         elseif ($jenjang === 'S3') {
-            $required = 13;
+            $required = 10; // Hanya dokumen wajib sesuai UPLOAD_DOKUMEN_GUIDE.md
             if ($this->formulir_pendaftaran) $uploaded++;
             if ($this->formulir_keabsahan) $uploaded++;
             if ($this->foto_formal) $uploaded++;
             if ($this->ktp) $uploaded++;
             if ($this->ijazah_slta) $uploaded++;
-            if ($this->sertifikat_akreditasi_prodi) $uploaded++;
-            if ($this->transkrip_d3_d4_s1) $uploaded++;
-            if ($this->riwayat_hidup) $uploaded++;
+            if ($this->ijazah_s2) $uploaded++;
+            if ($this->transkrip_s2) $uploaded++;
+            if ($this->sertifikat_akreditasi_s2) $uploaded++;
             if ($this->sertifikat_toefl) $uploaded++;
-            if ($this->rancangan_penelitian) $uploaded++;
-            if ($this->sk_mampu_komputer) $uploaded++;
-            if ($this->bukti_tes_tpa) $uploaded++;
-            if ($this->seleksi_tes_substansi) $uploaded++;
+            if ($this->rancangan_penelitian) $uploaded++; // Proposal Penelitian/Disertasi
+            // Dokumen opsional TIDAK dihitung:
+            // - sertifikat_akreditasi_s1
+            // - transkrip_d3_d4_s1 (transkrip S1)
+            // - riwayat_hidup
+            // - sk_mampu_komputer
+            // - bukti_tes_tpa
+            // - seleksi_tes_substansi
+            // - formulir_isian_foto
         }
         
         return $required > 0 ? round(($uploaded / $required) * 100) : 0;
