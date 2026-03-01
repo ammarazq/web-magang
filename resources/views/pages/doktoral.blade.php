@@ -230,8 +230,8 @@
                     <div id="captchaQuestion" class="px-4 py-3 bg-light border rounded text-center" style="min-width: 120px;">
                         <span class="fw-bold fs-5 text-dark">{{ session('captcha_doktoral_num1', 0) }} + {{ session('captcha_doktoral_num2', 0) }}</span>
                     </div>
-                    <span class="fw-bold fs-4">=</span>
-                    <input type="number" id="captchaAnswer" name="captcha_answer" class="form-control" style="max-width: 150px;" placeholder="Jawaban" value="{{ old('captcha_answer') }}" required>
+                    <span class="fw-bold fs-4 mx-4">=</span>
+                    <input type="number" id="captchaAnswer" name="captcha_answer" class="form-control mx-3" style="max-width: 160px;" placeholder="Jawaban" value="{{ old('captcha_answer') }}" required>
                     <button type="button" id="refreshCaptcha" class="btn btn-primary" title="Refresh CAPTCHA">
                         <i class="fa fa-refresh"></i> Refresh
                     </button>
