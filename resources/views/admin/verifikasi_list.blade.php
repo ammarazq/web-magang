@@ -24,6 +24,43 @@
             background-color: #f8f9fa;
             cursor: pointer;
         }
+        .progress-upload {
+            height: 28px;
+            border-radius: 15px;
+            background-color: #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar-upload {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .progress-bar-low {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+        .progress-bar-medium {
+            background: linear-gradient(90deg, #ffa502 0%, #ff7675 100%);
+        }
+        .progress-bar-high {
+            background: linear-gradient(90deg, #74b9ff 0%, #0984e3 100%);
+        }
+        .progress-bar-complete {
+            background: linear-gradient(90deg, #00b894 0%, #00cec9 100%);
+        }
+        .doc-count {
+            font-size: 11px;
+            color: #6c757d;
+            display: block;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
@@ -136,13 +173,38 @@
                                     </td>
                                     <td>
                                         @if($mhs->dokumen)
-                                            <div class="progress" style="height: 20px;">
-                                                <div class="progress-bar" role="progressbar" style="width: {{ $mhs->dokumen->getPersentaseKelengkapan() }}%">
-                                                    {{ $mhs->dokumen->getPersentaseKelengkapan() }}%
+                                            @php
+                                                $persentase = $mhs->dokumen->getPersentaseKelengkapan();
+                                                $jumlahDokumen = $mhs->dokumen->getJumlahDokumen();
+                                                
+                                                // Tentukan class warna berdasarkan persentase
+                                                if ($persentase == 100) {
+                                                    $colorClass = 'progress-bar-complete';
+                                                } elseif ($persentase >= 70) {
+                                                    $colorClass = 'progress-bar-high';
+                                                } elseif ($persentase >= 40) {
+                                                    $colorClass = 'progress-bar-medium';
+                                                } else {
+                                                    $colorClass = 'progress-bar-low';
+                                                }
+                                            @endphp
+                                            <div class="progress-upload">
+                                                <div class="progress-bar-upload {{ $colorClass }}" style="width: {{ $persentase }}%">
+                                                    {{ $persentase }}%
                                                 </div>
                                             </div>
+                                            <small class="doc-count">
+                                                <i class="fas fa-file-alt"></i> {{ $jumlahDokumen['uploaded'] }}/{{ $jumlahDokumen['total'] }} dokumen
+                                            </small>
                                         @else
-                                            0%
+                                            <div class="progress-upload">
+                                                <div class="progress-bar-upload progress-bar-low" style="width: 0%">
+                                                    0%
+                                                </div>
+                                            </div>
+                                            <small class="doc-count text-muted">
+                                                <i class="fas fa-file-alt"></i> 0 dokumen
+                                            </small>
                                         @endif
                                     </td>
                                     <td>

@@ -21,6 +21,43 @@
             border-color: #ffc107;
             background: #fff3cd;
         }
+        .progress-upload {
+            height: 35px;
+            border-radius: 15px;
+            background-color: #e9ecef;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-bar-upload {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .progress-bar-low {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ee5a6f 100%);
+        }
+        .progress-bar-medium {
+            background: linear-gradient(90deg, #ffa502 0%, #ff7675 100%);
+        }
+        .progress-bar-high {
+            background: linear-gradient(90deg, #74b9ff 0%, #0984e3 100%);
+        }
+        .progress-bar-complete {
+            background: linear-gradient(90deg, #00b894 0%, #00cec9 100%);
+        }
+        .doc-count {
+            font-size: 12px;
+            color: #6c757d;
+            display: block;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -74,12 +111,33 @@
                         <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Status Dokumen</h5>
                     </div>
                     <div class="card-body">
-                        <h6>Kelengkapan: {{ $dokumen->getPersentaseKelengkapan() }}%</h6>
-                        <div class="progress mb-3" style="height: 25px;">
-                            <div class="progress-bar" role="progressbar" style="width: {{ $dokumen->getPersentaseKelengkapan() }}%">
-                                {{ $dokumen->getPersentaseKelengkapan() }}%
+                        @php
+                            $persentase = $dokumen->getPersentaseKelengkapan();
+                            $jumlahDokumen = $dokumen->getJumlahDokumen();
+                            
+                            // Tentukan class warna berdasarkan persentase
+                            if ($persentase == 100) {
+                                $colorClass = 'progress-bar-complete';
+                            } elseif ($persentase >= 70) {
+                                $colorClass = 'progress-bar-high';
+                            } elseif ($persentase >= 40) {
+                                $colorClass = 'progress-bar-medium';
+                            } else {
+                                $colorClass = 'progress-bar-low';
+                            }
+                        @endphp
+                        
+                        <h6 class="mb-2">Progress Upload Dokumen</h6>
+                        <div class="progress-upload mb-2">
+                            <div class="progress-bar-upload {{ $colorClass }}" style="width: {{ $persentase }}%">
+                                {{ $persentase }}%
                             </div>
                         </div>
+                        <small class="doc-count">
+                            <i class="fas fa-file-alt"></i> {{ $jumlahDokumen['uploaded'] }} dari {{ $jumlahDokumen['total'] }} dokumen wajib telah di-upload
+                        </small>
+
+                        <hr class="my-3">
 
                         <p class="mb-2"><strong>Status Verifikasi:</strong></p>
                         @if($dokumen->status_dokumen === 'belum_lengkap')

@@ -186,10 +186,10 @@
                 <label for="email" class="form-label">Email</label>
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon3">@</span>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="contoh@email.com" required>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="contoh@gmail.com" required>
                 </div>
                 <small class="text-muted d-block mt-1">
-                    <i class="fa fa-info-circle"></i> Format email harus valid (contoh: nama@domain.com)
+                    <i class="fa fa-info-circle"></i> Email harus menggunakan domain <strong>@gmail.com</strong> (contoh: nama@gmail.com)
                 </small>
                 <div id="emailValidation" class="mt-1"></div>
             </div>
@@ -546,7 +546,7 @@
         }
 
         // ============================================
-        // VALIDASI EMAIL REAL-TIME
+        // VALIDASI EMAIL REAL-TIME (HARUS GMAIL.COM)
         // ============================================
         const emailInput = document.getElementById('email');
         const emailValidation = document.getElementById('emailValidation');
@@ -554,17 +554,28 @@
         if (emailInput && emailValidation) {
             emailInput.addEventListener('input', function() {
                 const email = this.value.trim();
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                // Pattern untuk memvalidasi email yang harus berakhiran @gmail.com
+                const gmailPattern = /^[a-zA-Z0-9._-]+@gmail\.com$/;
                 
                 if (email === '') {
                     emailValidation.innerHTML = '';
                     emailInput.classList.remove('is-valid', 'is-invalid');
-                } else if (emailPattern.test(email)) {
-                    emailValidation.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Format email valid</small>';
+                } else if (gmailPattern.test(email)) {
+                    emailValidation.innerHTML = '<small class="text-success"><i class="fa fa-check-circle"></i> Email gmail.com valid</small>';
                     emailInput.classList.remove('is-invalid');
                     emailInput.classList.add('is-valid');
                 } else {
-                    emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Format email tidak valid</small>';
+                    // Cek apakah user salah ketik gmail (misal: gmai, gmial, dll)
+                    if (email.includes('@') && !email.endsWith('@gmail.com')) {
+                        const domain = email.split('@')[1];
+                        if (domain && domain.includes('gma') || domain && domain.includes('gmi')) {
+                            emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Salah ketik? Harus menggunakan <strong>@gmail.com</strong></small>';
+                        } else {
+                            emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Email harus menggunakan domain <strong>@gmail.com</strong></small>';
+                        }
+                    } else {
+                        emailValidation.innerHTML = '<small class="text-danger"><i class="fa fa-times-circle"></i> Format email tidak valid. Harus: nama@gmail.com</small>';
+                    }
                     emailInput.classList.remove('is-valid');
                     emailInput.classList.add('is-invalid');
                 }

@@ -240,4 +240,84 @@ class DokumenMahasiswa extends Model
         
         return $required > 0 ? round(($uploaded / $required) * 100) : 0;
     }
+
+    /**
+     * Get jumlah dokumen yang sudah di-upload vs total dokumen wajib
+     */
+    public function getJumlahDokumen()
+    {
+        $mahasiswa = $this->mahasiswa;
+        
+        if (!$mahasiswa) {
+            return ['uploaded' => 0, 'total' => 0];
+        }
+
+        $jenjang = $mahasiswa->jenjang;
+        $jalurProgram = $mahasiswa->jalur_program;
+        $required = 0;
+        $uploaded = 0;
+        
+        // D3/D4 (Non RPL atau RPL - keduanya sama saja)
+        if (in_array($jenjang, ['D3', 'D4'])) {
+            $required = 5;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+        }
+        // S1 Non RPL
+        elseif ($jenjang === 'S1' && $jalurProgram === 'Non RPL') {
+            $required = 5;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+        }
+        // S1 RPL
+        elseif ($jenjang === 'S1' && $jalurProgram === 'RPL') {
+            $required = 6;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta_asli) $uploaded++;
+            if ($this->transkrip_nilai) $uploaded++;
+        }
+        // S2
+        elseif ($jenjang === 'S2') {
+            $required = 10;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+            if ($this->sertifikat_akreditasi_prodi) $uploaded++;
+            if ($this->transkrip_d3_d4_s1) $uploaded++;
+            if ($this->sertifikat_toefl) $uploaded++;
+            if ($this->rancangan_penelitian) $uploaded++;
+            if ($this->berkas_dokumen_pendaftaran) $uploaded++;
+        }
+        // S3
+        elseif ($jenjang === 'S3') {
+            $required = 11;
+            if ($this->formulir_pendaftaran) $uploaded++;
+            if ($this->formulir_keabsahan) $uploaded++;
+            if ($this->foto_formal) $uploaded++;
+            if ($this->ktp) $uploaded++;
+            if ($this->ijazah_slta) $uploaded++;
+            if ($this->ijazah_s2) $uploaded++;
+            if ($this->transkrip_s2) $uploaded++;
+            if ($this->sertifikat_akreditasi_s2) $uploaded++;
+            if ($this->sertifikat_toefl) $uploaded++;
+            if ($this->rancangan_penelitian) $uploaded++;
+            if ($this->berkas_dokumen_pendaftaran) $uploaded++;
+        }
+        
+        return [
+            'uploaded' => $uploaded,
+            'total' => $required
+        ];
+    }
 }
