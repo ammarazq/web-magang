@@ -194,16 +194,24 @@
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan Password" required>
-                <small class="text-muted d-block mt-1">
-                    <strong><i class="fa fa-info-circle"></i> Petunjuk Password:</strong><br>
-                    <span id="rule-lowercase" class="text-danger">✗ Harus mengandung minimal satu huruf kecil</span><br>
-                    <span id="rule-uppercase" class="text-danger">✗ Harus mengandung minimal satu huruf besar</span><br>
-                    <span id="rule-length" class="text-danger">✗ Minimal 8 karakter</span><br>
-                    <span id="rule-number" class="text-danger">✗ Harus mengandung minimal satu angka</span><br>
-                    <span id="rule-nodoublenum" class="text-danger">✗ Tidak boleh meninputkan angka berurutan (misal: 123, 234)</span><br>
-                    <span id="rule-nosequential" class="text-danger">✗ Tidak boleh mengandung karakter berurut (misal: abc, xyz)</span><br>
-                    <span id="rule-special" class="text-danger">✗ Harus mengandung minimal satu karakter unik (!@#$%^&*)</span>
-                </small>
+                
+                <!-- Card untuk Petunjuk Password -->
+                <div class="card mt-3" style="background-color: #d1ecf1; border: 1px solid #bee5eb;">
+                    <div class="card-body p-3">
+                        <h6 class="card-title mb-2" style="color: #0c5460;">
+                            <i class="fa fa-info-circle"></i> Petunjuk Password:
+                        </h6>
+                        <ul class="mb-0" style="font-size: 0.9rem; color: #0c5460;">
+                            <li id="rule-lowercase" class="text-danger">Harus mengandung minimal satu huruf kecil</li>
+                            <li id="rule-uppercase" class="text-danger">Harus mengandung minimal satu huruf besar</li>
+                            <li id="rule-length" class="text-danger">Minimal 8 karakter</li>
+                            <li id="rule-number" class="text-danger">Harus mengandung minimal satu angka</li>
+                            <li id="rule-nodoublenum" class="text-danger">Tidak boleh meninputkan angka berurutan (misal: 123, 234)</li>
+                            <li id="rule-nosequential" class="text-danger">Tidak boleh mengandung karakter berurut (misal: abc, xyz)</li>
+                            <li id="rule-special" class="text-danger">Harus mengandung minimal satu karakter unik (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-3">
