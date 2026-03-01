@@ -197,6 +197,44 @@ class Mahasiswa extends Model
     }
 
     /**
+     * Get nama program studi lengkap
+     *
+     * @return string
+     */
+    public function getNamaProgramStudi()
+    {
+        $programStudiList = [
+            // D3
+            '461' => 'Komputerisasi Akuntansi',
+            '462' => 'Manajemen Informatika',
+            
+            // D4
+            '471' => 'Teknik Informatika',
+            '472' => 'Sistem Informasi',
+            
+            // S1
+            '250' => 'Pendidikan Teknologi Informasi',
+            '251' => 'Teknik Informatika',
+            '252' => 'Sistem Informasi',
+            '253' => 'Teknik Komputer',
+            
+            // S2 (Magister)
+            '911' => 'Magister Pendidikan Teknologi Informasi',
+            '912' => 'Magister Teknik Informatika',
+            '913' => 'Magister Sistem Informasi',
+            
+            // S3 (Doktoral)
+            '921' => 'Doktor Ilmu Komputer',
+            '922' => 'Doktor Teknologi Informasi',
+        ];
+
+        $kode = $this->program_studi;
+        $nama = $programStudiList[$kode] ?? 'Program Studi Tidak Diketahui';
+        
+        return "{$nama} ({$kode})";
+    }
+
+    /**
      * Get formatted nama lengkap
      *
      * @return string

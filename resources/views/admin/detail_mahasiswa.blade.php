@@ -95,7 +95,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Program Studi</strong></td>
-                                <td>{{ $mahasiswa->program_studi }}</td>
+                                <td>{{ $mahasiswa->getNamaProgramStudi() }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Jalur Program</strong></td>
@@ -111,56 +111,72 @@
                         <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Status Dokumen</h5>
                     </div>
                     <div class="card-body">
-                        @php
-                            $persentase = $dokumen->getPersentaseKelengkapan();
-                            $jumlahDokumen = $dokumen->getJumlahDokumen();
+                        @if($dokumen)
+                            @php
+                                $persentase = $dokumen->getPersentaseKelengkapan();
+                                $jumlahDokumen = $dokumen->getJumlahDokumen();
+                                
+                                // Tentukan class warna berdasarkan persentase
+                                if ($persentase == 100) {
+                                    $colorClass = 'progress-bar-complete';
+                                } elseif ($persentase >= 70) {
+                                    $colorClass = 'progress-bar-high';
+                                } elseif ($persentase >= 40) {
+                                    $colorClass = 'progress-bar-medium';
+                                } else {
+                                    $colorClass = 'progress-bar-low';
+                                }
+                            @endphp
                             
-                            // Tentukan class warna berdasarkan persentase
-                            if ($persentase == 100) {
-                                $colorClass = 'progress-bar-complete';
-                            } elseif ($persentase >= 70) {
-                                $colorClass = 'progress-bar-high';
-                            } elseif ($persentase >= 40) {
-                                $colorClass = 'progress-bar-medium';
-                            } else {
-                                $colorClass = 'progress-bar-low';
-                            }
-                        @endphp
-                        
-                        <h6 class="mb-2">Progress Upload Dokumen</h6>
-                        <div class="progress-upload mb-2">
-                            <div class="progress-bar-upload {{ $colorClass }}" style="width: {{ $persentase }}%">
-                                {{ $persentase }}%
+                            <h6 class="mb-2">Progress Upload Dokumen</h6>
+                            <div class="progress-upload mb-2">
+                                <div class="progress-bar-upload {{ $colorClass }}" style="width: {{ $persentase }}%">
+                                    {{ $persentase }}%
+                                </div>
                             </div>
-                        </div>
-                        <small class="doc-count">
-                            <i class="fas fa-file-alt"></i> {{ $jumlahDokumen['uploaded'] }} dari {{ $jumlahDokumen['total'] }} dokumen wajib telah di-upload
-                        </small>
+                            <small class="doc-count">
+                                <i class="fas fa-file-alt"></i> {{ $jumlahDokumen['uploaded'] }} dari {{ $jumlahDokumen['total'] }} dokumen wajib telah di-upload
+                            </small>
 
-                        <hr class="my-3">
+                            <hr class="my-3">
 
-                        <p class="mb-2"><strong>Status Verifikasi:</strong></p>
-                        @if($dokumen->status_dokumen === 'belum_lengkap')
-                            <span class="badge bg-warning">Belum Lengkap</span>
-                        @elseif($dokumen->status_dokumen === 'lengkap')
-                            <span class="badge bg-info">Lengkap - Menunggu Verifikasi</span>
-                        @elseif($dokumen->status_dokumen === 'diverifikasi')
-                            <span class="badge bg-success">Diverifikasi</span>
+                            <p class="mb-2"><strong>Status Verifikasi:</strong></p>
+                            @if($dokumen->status_dokumen === 'belum_lengkap')
+                                <span class="badge bg-warning">Belum Lengkap</span>
+                            @elseif($dokumen->status_dokumen === 'lengkap')
+                                <span class="badge bg-info">Lengkap - Menunggu Verifikasi</span>
+                            @elseif($dokumen->status_dokumen === 'diverifikasi')
+                                <span class="badge bg-success">Diverifikasi</span>
+                            @else
+                                <span class="badge bg-danger">Ditolak</span>
+                            @endif
+
+                            @if($dokumen->verified_by)
+                                <hr>
+                                <p class="mb-1 small"><strong>Diverifikasi oleh:</strong></p>
+                                <p class="mb-1">{{ $dokumen->verifiedBy->name }}</p>
+                                <p class="text-muted small">{{ $dokumen->verified_at->format('d M Y, H:i') }}</p>
+                            @endif
+
+                            @if($dokumen->catatan_verifikasi)
+                                <hr>
+                                <p class="mb-1 small"><strong>Catatan Admin:</strong></p>
+                                <p class="small">{{ $dokumen->catatan_verifikasi }}</p>
+                            @endif
                         @else
-                            <span class="badge bg-danger">Ditolak</span>
-                        @endif
-
-                        @if($dokumen->verified_by)
-                            <hr>
-                            <p class="mb-1 small"><strong>Diverifikasi oleh:</strong></p>
-                            <p class="mb-1">{{ $dokumen->verifiedBy->name }}</p>
-                            <p class="text-muted small">{{ $dokumen->verified_at->format('d M Y, H:i') }}</p>
-                        @endif
-
-                        @if($dokumen->catatan_verifikasi)
-                            <hr>
-                            <p class="mb-1 small"><strong>Catatan Admin:</strong></p>
-                            <p class="small">{{ $dokumen->catatan_verifikasi }}</p>
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle"></i> Mahasiswa belum mengupload dokumen apapun.
+                                <hr>
+                                <h6 class="mb-2">Progress Upload Dokumen</h6>
+                                <div class="progress-upload mb-2">
+                                    <div class="progress-bar-upload progress-bar-low" style="width: 0%">
+                                        0%
+                                    </div>
+                                </div>
+                                <small class="doc-count">
+                                    <i class="fas fa-file-alt"></i> 0 dokumen telah di-upload
+                                </small>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -250,18 +266,19 @@
                             }
                         @endphp
 
-                        @foreach($documents as $field => $name)
-                            <div class="doc-card {{ $dokumen->$field ? 'doc-uploaded' : 'doc-missing' }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        @if($dokumen->$field)
-                                            <i class="fas fa-check-circle text-success"></i>
-                                        @else
-                                            <i class="fas fa-times-circle text-warning"></i>
-                                        @endif
-                                        <strong>{{ $name }}</strong>
-                                    </div>
-                                    <div>
+                        @if($dokumen)
+                            @foreach($documents as $field => $name)
+                                <div class="doc-card {{ $dokumen->$field ? 'doc-uploaded' : 'doc-missing' }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            @if($dokumen->$field)
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            @else
+                                                <i class="fas fa-times-circle text-warning"></i>
+                                            @endif
+                                            <strong>{{ $name }}</strong>
+                                        </div>
+                                        <div>
                                         @if($dokumen->$field)
                                             <a href="{{ route('admin.view', ['dokumenId' => $dokumen->id, 'field' => $field]) }}" target="_blank" class="btn btn-sm btn-outline-primary me-2">
                                                 <i class="fas fa-eye"></i> Lihat
@@ -275,12 +292,24 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                            @endforeach
+                        @else
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Mahasiswa belum mengupload dokumen apapun.
+                                <hr>
+                                <p class="mb-0">Berikut adalah daftar dokumen yang dibutuhkan untuk jenjang <strong>{{ $mahasiswa->jenjang }}</strong>:</p>
+                                <ul class="mt-2">
+                                    @foreach($documents as $field => $name)
+                                        <li>{{ $name }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Form Verifikasi -->
-                @if($dokumen->status_dokumen === 'lengkap' || $dokumen->status_dokumen === 'ditolak')
+                @if($dokumen && ($dokumen->status_dokumen === 'lengkap' || $dokumen->status_dokumen === 'ditolak'))
                 <div class="card shadow-sm mt-3">
                     <div class="card-header bg-warning">
                         <h5 class="mb-0"><i class="fas fa-check-double"></i> Verifikasi Dokumen</h5>

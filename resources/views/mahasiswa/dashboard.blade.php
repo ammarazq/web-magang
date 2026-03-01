@@ -70,7 +70,7 @@
                         <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
                         <h5>{{ $mahasiswa->nama_lengkap }}</h5>
                         <p class="text-muted mb-1">{{ $mahasiswa->email }}</p>
-                        <p class="text-muted mb-1">{{ $mahasiswa->jenjang }} - {{ $mahasiswa->program_studi }}</p>
+                        <p class="text-muted mb-1">{{ $mahasiswa->jenjang }} - {{ $mahasiswa->getNamaProgramStudi() }}</p>
                         <p class="badge bg-info">{{ $mahasiswa->jalur_program }}</p>
                     </div>
                 </div>

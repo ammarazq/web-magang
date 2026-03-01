@@ -154,7 +154,9 @@
                                     </td>
                                     <td>{{ $mhs->email }}</td>
                                     <td><span class="badge bg-info">{{ $mhs->jenjang }}</span></td>
-                                    <td>{{ $mhs->program_studi }}</td>
+                                    <td>
+                                        <strong>{{ $mhs->getNamaProgramStudi() }}</strong>
+                                    </td>
                                     <td><span class="badge bg-secondary">{{ $mhs->jalur_program }}</span></td>
                                     <td>
                                         @if($mhs->dokumen)
@@ -218,13 +220,9 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($mhs->dokumen)
-                                            <a href="{{ route('admin.detail', $mhs->id) }}" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-eye"></i> Detail
-                                            </a>
-                                        @else
-                                            <span class="text-muted">Tidak ada dokumen</span>
-                                        @endif
+                                        <a href="{{ route('admin.detail', $mhs->id) }}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> Detail
+                                        </a>
                                     </td>
                                 </tr>
                             @empty

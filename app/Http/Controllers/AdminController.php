@@ -36,15 +36,9 @@ class AdminController extends Controller
     {
         $admin = Auth::user();
         
-        // Get all mahasiswa dengan dokumen yang perlu diverifikasi
+        // Get ALL mahasiswa (termasuk yang belum upload sama sekali)
+        // Ini memungkinkan admin tracking dari 0%
         $mahasiswaList = Mahasiswa::with(['dokumen', 'user'])
-            ->whereHas('dokumen', function($query) {
-                $query->whereIn('status_dokumen', ['lengkap', 'diverifikasi', 'ditolak']);
-            })
-            ->orWhereHas('dokumen', function($query) {
-                $query->where('status_dokumen', 'belum_lengkap')
-                    ->whereNotNull('ijazah_slta'); // Ada yang sudah upload meski belum lengkap
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
@@ -67,10 +61,8 @@ class AdminController extends Controller
         $mahasiswa = Mahasiswa::with(['dokumen', 'user'])->findOrFail($id);
         $dokumen = $mahasiswa->dokumen;
 
-        if (!$dokumen) {
-            return redirect()->route('admin.dashboard')->with('error', 'Mahasiswa belum upload dokumen.');
-        }
-
+        // Tetap tampilkan halaman detail meskipun belum ada dokumen
+        // Ini memungkinkan admin melihat progress dari 0%
         return view('admin.detail_mahasiswa', compact('mahasiswa', 'dokumen'));
     }
 

@@ -115,7 +115,7 @@
                         <p class="mb-1"><small><strong>Nama:</strong></small><br>{{ $mahasiswa->nama_lengkap }}</p>
                         <p class="mb-1"><small><strong>Email:</strong></small><br>{{ $mahasiswa->email }}</p>
                         <p class="mb-1"><small><strong>Program:</strong></small><br>Diploma III (D3)</p>
-                        <p class="mb-1"><small><strong>Prodi:</strong></small><br>{{ $mahasiswa->program_studi }}</p>
+                        <p class="mb-1"><small><strong>Prodi:</strong></small><br>{{ $mahasiswa->getNamaProgramStudi() }}</p>
                         <p class="mb-0"><small><strong>Status Dokumen:</strong></small><br>
                             @if($dokumen && $dokumen->status_dokumen === 'belum_lengkap')
                                 <span class="badge bg-warning">Belum Lengkap</span>
@@ -288,7 +288,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Validasi ukuran file saat dipilih
+        // Tracking file yang sudah dipilih untuk deteksi duplikat
+        const selectedFiles = new Map();
+
+        // Validasi ukuran file dan deteksi duplikat
         document.addEventListener('DOMContentLoaded', function() {
             const fileInputs = document.querySelectorAll('input[type="file"]');
             
@@ -300,31 +303,128 @@
                     const fileName = file.name;
                     const fileSize = file.size;
                     const fileExtension = fileName.split('.').pop().toLowerCase();
+                    const inputName = e.target.name;
                     
+                    // 1. VALIDASI FORMAT FILE
                     let maxSize;
                     let maxSizeText;
                     
-                    if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-                        maxSize = 2 * 1024 * 1024;
+                    if (inputName === 'foto_formal' || inputName === 'ktp') {
+                        maxSize = 1 * 1024 * 1024; // 1MB untuk foto
+                        maxSizeText = '1MB';
+                    } else if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+                        maxSize = 2 * 1024 * 1024; // 2MB untuk gambar lain
                         maxSizeText = '2MB';
                     } else if (fileExtension === 'pdf') {
-                        maxSize = 5 * 1024 * 1024;
-                        maxSizeText = '5MB';
+                        maxSize = 2 * 1024 * 1024; // 2MB untuk PDF
+                        maxSizeText = '2MB';
                     } else {
-                        alert('Format file tidak didukung!');
+                        showError('Format file tidak didukung!\nHanya file JPG/JPEG/PDF yang diperbolehkan.');
                         e.target.value = '';
                         return;
                     }
                     
+                    // 2. VALIDASI UKURAN FILE
                     if (fileSize > maxSize) {
                         const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
-                        alert(`Ukuran file terlalu besar (${fileSizeMB}MB)!\nMaksimal ukuran file adalah ${maxSizeText}.\nSilakan kompres atau pilih file lain.`);
+                        const maxSizeMB = (maxSize / (1024 * 1024)).toFixed(0);
+                        showError(
+                            `⚠️ UKURAN FILE TERLALU BESAR!\n\n` +
+                            `Ukuran file: ${fileSizeMB} MB\n` +
+                            `Maksimal: ${maxSizeMB} MB\n\n` +
+                            `Silakan kompres file atau pilih file lain yang lebih kecil.`
+                        );
                         e.target.value = '';
+                        
+                        // Tambahkan peringatan visual
+                        const uploadItem = e.target.closest('.upload-item');
+                        uploadItem.style.borderColor = '#dc3545';
+                        uploadItem.style.backgroundColor = '#f8d7da';
+                        setTimeout(() => {
+                            uploadItem.style.borderColor = '';
+                            uploadItem.style.backgroundColor = '';
+                        }, 3000);
                         return;
                     }
+                    
+                    // 3. DETEKSI FILE DUPLIKAT
+                    let isDuplicate = false;
+                    let duplicateField = '';
+                    
+                    selectedFiles.forEach((existingFile, field) => {
+                        if (field !== inputName && existingFile.name === fileName && existingFile.size === fileSize) {
+                            isDuplicate = true;
+                            duplicateField = field;
+                        }
+                    });
+                    
+                    if (isDuplicate) {
+                        const fieldNames = {
+                            'formulir_pendaftaran': 'Formulir Pendaftaran',
+                            'formulir_keabsahan': 'Formulir Keabsahan',
+                            'foto_formal': 'Foto Formal',
+                            'ktp': 'KTP/Identitas',
+                            'ijazah_slta': 'Ijazah SLTA'
+                        };
+                        
+                        showError(
+                            `⚠️ FILE DUPLIKAT TERDETEKSI!\n\n` +
+                            `File "${fileName}" sudah dipilih untuk:\n` +
+                            `${fieldNames[duplicateField] || duplicateField}\n\n` +
+                            `Pastikan Anda tidak salah memilih file yang sama untuk dokumen yang berbeda!`
+                        );
+                        
+                        const confirmUpload = confirm(
+                            `Apakah Anda yakin file ini berbeda dengan yang sudah dipilih?\n\n` +
+                            `Klik OK untuk tetap upload, atau Cancel untuk memilih file lain.`
+                        );
+                        
+                        if (!confirmUpload) {
+                            e.target.value = '';
+                            return;
+                        }
+                    }
+                    
+                    // 4. SIMPAN FILE KE TRACKING
+                    selectedFiles.set(inputName, {
+                        name: fileName,
+                        size: fileSize
+                    });
+                    
+                    // 5. TAMPILKAN KONFIRMASI SUKSES
+                    const uploadItem = e.target.closest('.upload-item');
+                    uploadItem.style.borderColor = '#28a745';
+                    uploadItem.style.backgroundColor = '#d4edda';
+                    
+                    showSuccess(`✓ File dipilih: ${fileName} (${(fileSize / 1024).toFixed(0)} KB)`);
                 });
             });
         });
+        
+        function showError(message) {
+            alert(message);
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i> <strong>Error:</strong><br>
+                ${message.replace(/\n/g, '<br>')}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.container').firstChild);
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+        
+        function showSuccess(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
     </script>
 </body>
 </html>

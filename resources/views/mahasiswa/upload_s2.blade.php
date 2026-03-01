@@ -286,7 +286,7 @@
                 <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
             </a>
             <h2 class="mt-3"><i class="fas fa-upload"></i> Upload Dokumen S2 (Magister)</h2>
-            <p class="subtitle">{{ $mahasiswa->nama_lengkap }} - {{ $mahasiswa->program_studi }}</p>
+            <p class="subtitle">{{ $mahasiswa->nama_lengkap }} - {{ $mahasiswa->getNamaProgramStudi() }}</p>
         </div>
 
         @if(session('success'))

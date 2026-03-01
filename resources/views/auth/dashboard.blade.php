@@ -218,7 +218,7 @@
                 @if($mahasiswa->program_studi)
                 <div class="info-item">
                     <span class="info-label">Program Studi:</span>
-                    <span class="info-value">{{ $mahasiswa->program_studi }}</span>
+                    <span class="info-value">{{ $mahasiswa->getNamaProgramStudi() }}</span>
                 </div>
                 @endif
                 <div class="info-item">
