@@ -28,22 +28,179 @@
             background: #fff3cd;
             border-left: 4px solid #ffc107;
         }
+        .top-bar {
+            background: #0a1128;
+            color: #fff;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .social-icons a {
+            color: #fff;
+            margin-right: 15px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        .social-icons a:hover {
+            color: #4facfe;
+        }
+        .top-contact {
+            color: #fff;
+        }
+        .top-contact i {
+            color: #4facfe;
+            margin-right: 5px;
+        }
+        .navbar-modern {
+            background: #1a1d3f;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            color: #fff !important;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .brand-icon {
+            color: #4facfe;
+            font-size: 28px;
+            margin-right: 10px;
+        }
+        .brand-text {
+            color: #fff;
+        }
+        .navbar-modern .navbar-nav .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+            padding: 8px 20px !important;
+            margin: 0 5px;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        .navbar-modern .navbar-nav .nav-link:hover {
+            color: #4facfe !important;
+        }
+        .navbar-modern .navbar-nav .nav-link.active {
+            color: #4facfe !important;
+            position: relative;
+        }
+        .navbar-modern .navbar-nav .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #4facfe;
+        }
+        .navbar-modern .dropdown-menu {
+            background: #1a1d3f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .navbar-modern .dropdown-item {
+            color: #fff;
+            transition: all 0.3s;
+        }
+        .navbar-modern .dropdown-item:hover {
+            background: rgba(79, 172, 254, 0.1);
+            color: #4facfe;
+        }
+        .navbar-modern .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Top Bar -->
+    <div class="top-bar">
         <div class="container">
-            <a class="navbar-brand" href="#">Portal Mahasiswa</a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text text-white me-3">
-                    <i class="fas fa-user"></i> {{ Auth::user()->name }}
-                </span>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <span class="top-contact">
+                        <i class="fas fa-phone-alt"></i> +62 123 456 789
+                        <span class="ms-3"><i class="fas fa-envelope"></i> mahasiswa@portal.ac.id</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
+        <div class="container">
+            <a class="navbar-brand" href="{{ route('mahasiswa.dashboard') }}">
+                <i class="fas fa-fire brand-icon"></i>
+                <span class="brand-text">Portal Mahasiswa</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('mahasiswa.dashboard') }}">
+                            DASHBOARD
+                        </a>
+                    </li>
+                    @if($mahasiswa->jenjang === 'S2')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('magister.upload') }}">
+                                UPLOAD DOKUMEN S2
+                            </a>
+                        </li>
+                    @elseif($mahasiswa->jenjang === 'S3')
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('doktoral.upload') }}">
+                                UPLOAD DOKUMEN S3
+                            </a>
+                        </li>
+                    @elseif(in_array($mahasiswa->jenjang, ['D3', 'D4', 'S1']))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('sarjana.upload') }}">
+                                UPLOAD DOKUMEN
+                            </a>
+                        </li>
+                    @endif
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-id-card"></i> {{ $mahasiswa->jenjang }} - {{ $mahasiswa->getNamaProgramStudi() }}
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -77,6 +234,50 @@
             </div>
 
             <div class="col-md-8">
+                <!-- Status Dokumen -->
+                <div class="card card-status status-{{ $dokumen->status_dokumen }} mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-file-alt"></i> Status Dokumen
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Status:</strong> 
+                                    @if($dokumen->status_dokumen === 'belum_lengkap')
+                                        <span class="badge bg-warning">Belum Lengkap</span>
+                                    @elseif($dokumen->status_dokumen === 'lengkap')
+                                        <span class="badge bg-info">Lengkap - Menunggu Verifikasi</span>
+                                    @elseif($dokumen->status_dokumen === 'diverifikasi')
+                                        <span class="badge bg-success">Diverifikasi</span>
+                                    @else
+                                        <span class="badge bg-danger">Ditolak</span>
+                                    @endif
+                                </p>
+                                <p class="mb-1"><strong>Kelengkapan:</strong> {{ $dokumen->getPersentaseKelengkapan() }}%</p>
+                            </div>
+                            <div class="col-md-6">
+                                @if($dokumen->verified_by)
+                                    <p class="mb-1"><strong>Diverifikasi oleh:</strong> {{ $dokumen->verifiedBy->name }}</p>
+                                    <p class="mb-1"><strong>Tanggal:</strong> {{ $dokumen->verified_at->format('d M Y H:i') }}</p>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        @if($dokumen->catatan_verifikasi)
+                            <div class="alert alert-{{ $dokumen->status_dokumen === 'diverifikasi' ? 'success' : 'danger' }} mt-3 mb-0">
+                                <strong>Catatan Admin:</strong><br>
+                                {{ $dokumen->catatan_verifikasi }}
+                            </div>
+                        @endif
+
+                        <div class="progress mt-3" style="height: 25px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ $dokumen->getPersentaseKelengkapan() }}%">
+                                {{ $dokumen->getPersentaseKelengkapan() }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Konten Utama Upload Dokumen -->
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
@@ -128,50 +329,6 @@
                                     <li>Upload dokumen dengan jelas dan terbaca</li>
                                     <li>Dokumen yang sudah diupload bisa diupdate/diganti</li>
                                 </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status Dokumen -->
-                <div class="card card-status status-{{ $dokumen->status_dokumen }} mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <i class="fas fa-file-alt"></i> Status Dokumen
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="mb-1"><strong>Status:</strong> 
-                                    @if($dokumen->status_dokumen === 'belum_lengkap')
-                                        <span class="badge bg-warning">Belum Lengkap</span>
-                                    @elseif($dokumen->status_dokumen === 'lengkap')
-                                        <span class="badge bg-info">Lengkap - Menunggu Verifikasi</span>
-                                    @elseif($dokumen->status_dokumen === 'diverifikasi')
-                                        <span class="badge bg-success">Diverifikasi</span>
-                                    @else
-                                        <span class="badge bg-danger">Ditolak</span>
-                                    @endif
-                                </p>
-                                <p class="mb-1"><strong>Kelengkapan:</strong> {{ $dokumen->getPersentaseKelengkapan() }}%</p>
-                            </div>
-                            <div class="col-md-6">
-                                @if($dokumen->verified_by)
-                                    <p class="mb-1"><strong>Diverifikasi oleh:</strong> {{ $dokumen->verifiedBy->name }}</p>
-                                    <p class="mb-1"><strong>Tanggal:</strong> {{ $dokumen->verified_at->format('d M Y H:i') }}</p>
-                                @endif
-                            </div>
-                        </div>
-                        
-                        @if($dokumen->catatan_verifikasi)
-                            <div class="alert alert-{{ $dokumen->status_dokumen === 'diverifikasi' ? 'success' : 'danger' }} mt-3 mb-0">
-                                <strong>Catatan Admin:</strong><br>
-                                {{ $dokumen->catatan_verifikasi }}
-                            </div>
-                        @endif
-
-                        <div class="progress mt-3" style="height: 25px;">
-                            <div class="progress-bar" role="progressbar" style="width: {{ $dokumen->getPersentaseKelengkapan() }}%">
-                                {{ $dokumen->getPersentaseKelengkapan() }}%
                             </div>
                         </div>
                     </div>

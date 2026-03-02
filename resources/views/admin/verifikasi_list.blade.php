@@ -61,6 +61,16 @@
             display: block;
             margin-top: 3px;
         }
+        .pagination .page-link {
+            border-radius: 8px;
+            padding: 8px 14px;
+            margin: 0 4px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 <body>
@@ -235,9 +245,16 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $mahasiswaList->links() }}
-                </div>
+                @if($mahasiswaList->hasPages())
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top gap-3">
+                        <div class="text-muted flex-shrink-0">
+                            Menampilkan {{ $mahasiswaList->firstItem() }} - {{ $mahasiswaList->lastItem() }} dari {{ $mahasiswaList->total() }} mahasiswa
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {{ $mahasiswaList->links() }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

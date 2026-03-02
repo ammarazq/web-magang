@@ -6,6 +6,18 @@
     <title>User Management - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .pagination .page-link {
+            border-radius: 8px;
+            padding: 8px 14px;
+            margin: 0 4px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+    </style>
 </head>
 <body>
     @include('admin.navbar')
@@ -117,9 +129,16 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $users->links() }}
-                </div>
+                @if($users->hasPages())
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top gap-3">
+                        <div class="text-muted flex-shrink-0">
+                            Menampilkan {{ $users->firstItem() }} - {{ $users->lastItem() }} dari {{ $users->total() }} user
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            {{ $users->appends(request()->query())->links() }}
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

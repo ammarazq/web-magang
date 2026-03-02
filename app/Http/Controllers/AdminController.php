@@ -14,19 +14,25 @@ class AdminController extends Controller
     /**
      * Dashboard Admin - Menampilkan statistik
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $admin = Auth::user();
 
         // Statistics
         $stats = [
             'total_mahasiswa' => Mahasiswa::count(),
+            'belum_lengkap' => DokumenMahasiswa::where('status_dokumen', 'belum_lengkap')->count(),
             'menunggu_verifikasi' => DokumenMahasiswa::where('status_dokumen', 'lengkap')->count(),
             'sudah_diverifikasi' => DokumenMahasiswa::where('status_dokumen', 'diverifikasi')->count(),
             'ditolak' => DokumenMahasiswa::where('status_dokumen', 'ditolak')->count(),
         ];
 
-        return view('admin.dashboard', compact('admin', 'stats'));
+        // Get paginated mahasiswa data
+        $allMahasiswa = Mahasiswa::with(['dokumen'])
+            ->orderBy('updated_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.dashboard', compact('admin', 'stats', 'allMahasiswa'));
     }
 
     /**
