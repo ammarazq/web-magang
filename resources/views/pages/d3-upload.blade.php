@@ -115,7 +115,7 @@
                         <p class="mb-1"><small><strong>Nama:</strong></small><br>{{ $mahasiswa->nama_lengkap }}</p>
                         <p class="mb-1"><small><strong>Email:</strong></small><br>{{ $mahasiswa->email }}</p>
                         <p class="mb-1"><small><strong>Program:</strong></small><br>Diploma III (D3)</p>
-                        <p class="mb-1"><small><strong>Prodi:</strong></small><br>{{ $mahasiswa->getNamaProgramStudi() }}</p>
+                        <p class="mb-1"><small><strong>Prodi:</strong></small><br>{{ $mahasiswa->nama_program_studi }}</p>
                         <p class="mb-0"><small><strong>Status Dokumen:</strong></small><br>
                             @if($dokumen && $dokumen->status_dokumen === 'belum_lengkap')
                                 <span class="badge bg-warning">Belum Lengkap</span>

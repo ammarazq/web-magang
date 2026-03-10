@@ -95,7 +95,7 @@
                             </tr>
                             <tr>
                                 <td><strong>Program Studi</strong></td>
-                                <td>{{ $mahasiswa->getNamaProgramStudi() }}</td>
+                                <td>{{ $mahasiswa->nama_program_studi }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Jalur Program</strong></td>

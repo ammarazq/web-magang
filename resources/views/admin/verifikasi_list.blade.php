@@ -165,7 +165,7 @@
                                     <td>{{ $mhs->email }}</td>
                                     <td><span class="badge bg-info">{{ $mhs->jenjang }}</span></td>
                                     <td>
-                                        <strong>{{ $mhs->getNamaProgramStudi() }}</strong>
+                                        <strong>{{ $mhs->nama_program_studi }}</strong>
                                     </td>
                                     <td><span class="badge bg-secondary">{{ $mhs->jalur_program }}</span></td>
                                     <td>

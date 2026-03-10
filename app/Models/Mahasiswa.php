@@ -50,7 +50,8 @@ class Mahasiswa extends Model
         // Data Akademik (khusus Sarjana)
         'jalur_program',    // RPL / Non RPL
         'jenjang',          // D3, D4, S1
-        'program_studi',
+        'program_studi',    // nama program studi
+        'kode_program_studi', // kode program studi
         
         // Jenis Pendaftaran
         'jenis_pendaftaran', // sarjana, magister, doktoral
@@ -197,13 +198,13 @@ class Mahasiswa extends Model
     }
 
     /**
-     * Get nama program studi lengkap
+     * Get daftar program studi dengan kode
      *
-     * @return string
+     * @return array
      */
-    public function getNamaProgramStudi()
+    public static function getProgramStudiList()
     {
-        $programStudiList = [
+        return [
             // D3
             '461' => 'Komputerisasi Akuntansi',
             '462' => 'Manajemen Informatika',
@@ -213,10 +214,13 @@ class Mahasiswa extends Model
             '472' => 'Sistem Informasi',
             
             // S1
+            '76' => 'Pendidikan Teknologi Informasi',
             '250' => 'Pendidikan Teknologi Informasi',
             '251' => 'Teknik Informatika',
             '252' => 'Sistem Informasi',
             '253' => 'Teknik Komputer',
+            '279' => 'Teknik Informatika',
+            '311' => 'Sistem Informasi',
             
             // S2 (Magister)
             '911' => 'Magister Pendidikan Teknologi Informasi',
@@ -227,9 +231,45 @@ class Mahasiswa extends Model
             '921' => 'Doktor Ilmu Komputer',
             '922' => 'Doktor Teknologi Informasi',
         ];
+    }
 
-        $kode = $this->program_studi;
-        $nama = $programStudiList[$kode] ?? 'Program Studi Tidak Diketahui';
+    /**
+     * Get nama program studi saja (tanpa kode)
+     *
+     * @return string
+     */
+    public function getNamaProgramStudiAttribute()
+    {
+        // Jika kolom program_studi sudah berisi nama (bukan numeric), gunakan langsung
+        if (!empty($this->attributes['program_studi']) && !is_numeric($this->attributes['program_studi'])) {
+            return $this->attributes['program_studi'];
+        }
+        
+        // Jika masih berupa kode, convert ke nama menggunakan kode_program_studi atau program_studi
+        $programStudiList = self::getProgramStudiList();
+        $kode = $this->attributes['kode_program_studi'] ?? $this->attributes['program_studi'] ?? null;
+        
+        return $programStudiList[$kode] ?? 'Program Studi Tidak Diketahui';
+    }
+
+    /**
+     * Get nama program studi dengan kode
+     *
+     * @return string
+     */
+    public function getProgramStudiLengkap()
+    {
+        $nama = $this->nama_program_studi;
+        $kode = $this->attributes['kode_program_studi'] ?? null;
+        
+        // Jika program_studi masih berupa kode, gunakan itu sebagai kode
+        if (is_numeric($this->attributes['program_studi'] ?? '')) {
+            $kode = $this->attributes['program_studi'];
+        }
+        
+        if ($nama === 'Program Studi Tidak Diketahui') {
+            return $nama;
+        }
         
         return "{$nama} ({$kode})";
     }

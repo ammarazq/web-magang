@@ -28,7 +28,7 @@
         <small class="text-muted">{{ $mhs->email }}</small>
     </td>
     <td><span class="badge bg-info">{{ $mhs->jenjang }}</span></td>
-    <td>{{ $mhs->getNamaProgramStudi() }}</td>
+    <td>{{ $mhs->nama_program_studi }}</td>
     <td>
         <div class="progress" style="height: 25px;">
             <div class="progress-bar {{ $colorClass }}" 
