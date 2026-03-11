@@ -170,7 +170,7 @@
                     </div>
                     <div class="card-body p-4">
                         <div class="row">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <a href="{{ route('admin.verifikasi.list') }}" class="text-decoration-none">
                                     <div class="card border-0 h-100 quick-action-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
                                         <div class="card-body text-center p-4">
@@ -182,7 +182,7 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <a href="{{ route('admin.users') }}" class="text-decoration-none">
                                     <div class="card border-0 h-100 quick-action-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                                         <div class="card-body text-center p-4">
@@ -194,7 +194,19 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ route('admin.google-drive.status') }}" class="text-decoration-none">
+                                    <div class="card border-0 h-100 quick-action-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                        <div class="card-body text-center p-4">
+                                            <i class="fas fa-cloud fa-3x mb-3" style="opacity: 0.9;"></i>
+                                            <h5 class="fw-bold">Google Drive</h5>
+                                            <p class="mb-3" style="opacity: 0.9;">Backup & cloud storage</p>
+                                            <span class="badge bg-white text-dark">Cloud Backup</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <div class="card border-0 h-100 quick-action-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
                                     <div class="card-body text-center p-4">
                                         <i class="fas fa-chart-bar fa-3x mb-3" style="opacity: 0.9;"></i>

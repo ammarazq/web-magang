@@ -8,6 +8,7 @@ use App\Http\Controllers\DoktoralController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\GoogleDriveController;
 
 // Authentication Routes
 Route::get('/register', [AuthController::class, 'register'])->name('register');
@@ -51,6 +52,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('users.edit');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    
+    // Google Drive Routes
+    Route::prefix('google-drive')->name('google-drive.')->group(function () {
+        Route::get('/status', [GoogleDriveController::class, 'status'])->name('status');
+        Route::get('/authorize', [GoogleDriveController::class, 'authorize'])->name('authorize');
+        Route::get('/callback', [GoogleDriveController::class, 'callback'])->name('callback');
+        Route::post('/backup/{id}', [GoogleDriveController::class, 'backup'])->name('backup');
+        Route::post('/backup-all', [GoogleDriveController::class, 'backupAll'])->name('backup-all');
+        Route::get('/download/{id}/{field}', [GoogleDriveController::class, 'download'])->name('download');
+        Route::delete('/backup/{id}', [GoogleDriveController::class, 'deleteBackup'])->name('delete-backup');
+        Route::get('/statistics', [GoogleDriveController::class, 'statistics'])->name('statistics');
+    });
 });
 
 // Homepage

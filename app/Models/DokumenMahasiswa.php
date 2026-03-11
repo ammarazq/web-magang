@@ -44,10 +44,18 @@ class DokumenMahasiswa extends Model
         'catatan_verifikasi',
         'verified_by',
         'verified_at',
+        // Google Drive Integration
+        'google_drive_folder_id',
+        'google_drive_files',
+        'is_backed_up',
+        'last_backup_at',
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'google_drive_files' => 'array',
+        'is_backed_up' => 'boolean',
+        'last_backup_at' => 'datetime',
     ];
 
     /**
@@ -318,6 +326,38 @@ class DokumenMahasiswa extends Model
         return [
             'uploaded' => $uploaded,
             'total' => $required
+        ];
+    }
+
+    /**
+     * Get list of all document field names for backup operations
+     * 
+     * @return array Array of document field names
+     */
+    public static function getDokumenFields(): array
+    {
+        return [
+            // D3, D4, S1 documents
+            'formulir_pendaftaran',
+            'formulir_keabsahan',
+            'foto_formal',
+            'ktp',
+            'ijazah_slta',
+            'sertifikat_akreditasi_prodi',
+            'transkrip_d3_d4_s1',
+            'berkas_dokumen_pendaftaran',
+            
+            // S2 documents
+            'ijazah_s1',
+            'transkrip_s1',
+            'sertifikat_akreditasi_s1',
+            'sertifikat_toefl',
+            'rancangan_penelitian',
+            
+            // S3 documents
+            'ijazah_s2',
+            'transkrip_s2',
+            'sertifikat_akreditasi_s2',
         ];
     }
 }

@@ -163,6 +163,39 @@
                                 <p class="mb-1 small"><strong>Catatan Admin:</strong></p>
                                 <p class="small">{{ $dokumen->catatan_verifikasi }}</p>
                             @endif
+
+                            <!-- Google Drive Backup Status -->
+                            @if(config('google-drive.enabled'))
+                                <hr>
+                                <p class="mb-1 small"><strong>Google Drive Backup:</strong></p>
+                                @if($dokumen->is_backed_up)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-cloud-upload-alt"></i> Backed Up
+                                    </span>
+                                    @if($dokumen->last_backup_at)
+                                        <p class="text-muted small mb-0">Last: {{ $dokumen->last_backup_at->format('d M Y, H:i') }}</p>
+                                    @endif
+                                    @if($dokumen->google_drive_files && is_array($dokumen->google_drive_files))
+                                        <p class="text-muted small mb-2">{{ count($dokumen->google_drive_files) }} files in Drive</p>
+                                    @endif
+                                    <form action="{{ route('admin.google-drive.backup', $dokumen->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-primary mt-1">
+                                            <i class="fas fa-sync"></i> Re-backup
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-cloud"></i> Not Backed Up
+                                    </span>
+                                    <form action="{{ route('admin.google-drive.backup', $dokumen->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-primary mt-2">
+                                            <i class="fas fa-cloud-upload-alt"></i> Backup Now
+                                        </button>
+                                    </form>
+                                @endif
+                            @endif
                         @else
                             <div class="alert alert-warning mb-0">
                                 <i class="fas fa-exclamation-triangle"></i> Mahasiswa belum mengupload dokumen apapun.
