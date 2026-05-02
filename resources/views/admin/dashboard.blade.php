@@ -295,6 +295,7 @@
                                                     <th>Program Studi</th>
                                                     <th>Progress Upload</th>
                                                     <th>Status</th>
+                                                    <th>Reviewer</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -322,6 +323,7 @@
                                                     <th>Program Studi</th>
                                                     <th>Progress Upload</th>
                                                     <th>Status</th>
+                                                    <th>Reviewer</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -349,6 +351,7 @@
                                                     <th>Program Studi</th>
                                                     <th>Progress Upload</th>
                                                     <th>Status</th>
+                                                    <th>Reviewer</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -376,6 +379,7 @@
                                                     <th>Program Studi</th>
                                                     <th>Progress Upload</th>
                                                     <th>Status</th>
+                                                    <th>Reviewer</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -403,6 +407,7 @@
                                                     <th>Program Studi</th>
                                                     <th>Progress Upload</th>
                                                     <th>Status</th>
+                                                    <th>Reviewer</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>

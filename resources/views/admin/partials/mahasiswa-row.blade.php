@@ -61,6 +61,14 @@
         @endif
     </td>
     <td>
+        @if($mhs->dokumen && $mhs->dokumen->verifiedBy)
+            <strong>{{ $mhs->dokumen->verifiedBy->name }}</strong><br>
+            <small class="text-muted">{{ $mhs->dokumen->verifiedBy->email }}</small>
+        @else
+            <span class="text-muted">-</span>
+        @endif
+    </td>
+    <td>
         @if($mhs->dokumen)
             <a href="{{ route('admin.detail', $mhs->id) }}" class="btn btn-sm btn-primary">
                 <i class="fas fa-eye"></i> Detail

@@ -27,6 +27,7 @@ class GoogleDriveController extends Controller
             'auto_backup' => config('google-drive.auto_backup'),
             'configured' => file_exists(storage_path('app/google-drive/credentials.json')),
             'authenticated' => file_exists(storage_path('app/google-drive/token.json')),
+            'connected_email' => $this->driveService->getConnectedEmail(),
         ];
 
         return view('admin.google-drive.status', compact('config'));

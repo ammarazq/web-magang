@@ -86,6 +86,22 @@ class GoogleDriveService
         }
     }
 
+    public function getConnectedEmail(): ?string
+    {
+        if (!$this->isConfigured()) {
+            return null;
+        }
+
+        try {
+            $oauth2 = new \Google\Service\Oauth2($this->client);
+            $userInfo = $oauth2->userinfo->get();
+            return $userInfo->email;
+        } catch (Exception $e) {
+            Log::error('Gagal mendapatkan email Google Drive: ' . $e->getMessage());
+            return null;
+        }
+    }
+
     /**
      * Get OAuth URL for authorization
      */

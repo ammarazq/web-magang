@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -170,6 +170,19 @@
                             </td>
                         </tr>
                         <tr>
+                            <td><strong>Connected Email:</strong></td>
+                            <td>
+                                @if($config['connected_email'])
+                                    <span class="text-success"><strong>{{ $config['connected_email'] }}</strong></span>
+                                @else
+                                    <span class="text-muted"><em>Not connected / Unable to verify</em></span>
+                                    @if($config['authenticated'])
+                                        <small class="text-warning d-block"><i class="bi bi-info-circle"></i> Make sure .../auth/userinfo.email scope is added.</small>
+                                    @endif
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
                             <td><strong>Token File:</strong></td>
                             <td>
                                 @if($config['authenticated'])
@@ -302,3 +315,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

@@ -36,6 +36,8 @@ return [
     'scopes' => [
         \Google\Service\Drive::DRIVE_FILE, // Akses file yang dibuat oleh aplikasi
         \Google\Service\Drive::DRIVE_METADATA_READONLY, // Baca metadata
+        \Google\Service\Oauth2::USERINFO_EMAIL, // Untuk mendapatkan email akun yang dihubungkan
+        \Google\Service\Oauth2::USERINFO_PROFILE,
     ],
 
     // Application Name
